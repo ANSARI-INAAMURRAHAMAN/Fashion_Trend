@@ -1,0 +1,265 @@
+/* Navbar.css */
+
+/* Base navbar styles */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #1a1a1a;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+
+.navbar-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.navbar-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 64px;
+}
+
+/* Brand styles */
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: white;
+    gap: 12px;
+}
+
+.brand-icon {
+    width: 32px;
+    height: 32px;
+    color: #3b82f6;
+}
+
+.brand-text {
+    font-size: 1.25rem;
+    font-weight: bold;
+    background: linear-gradient(to right, #3b82f6, #8b5cf6);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Desktop navigation */
+.desktop-nav {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    color: #a3a3a3;
+    text-decoration: none;
+    padding: 8px 12px;
+    transition: color 0.2s ease;
+    position: relative;
+}
+
+.nav-link:hover {
+    color: white;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: #3b82f6;
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+.nav-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+}
+
+/* Notification styles */
+.notification-container {
+    position: relative;
+}
+
+.notification-button {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.notification-icon {
+    width: 20px;
+    height: 20px;
+    color: #a3a3a3;
+    transition: color 0.2s ease;
+}
+
+.notification-button:hover .notification-icon {
+    color: white;
+}
+
+.notification-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #3b82f6;
+    color: white;
+    font-size: 12px;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translate(25%, -25%);
+}
+
+.notification-dropdown {
+    position: absolute;
+    top: 100%;
+    right: -100px;
+    width: 300px;
+    background-color: #1a1a1a;
+    border: 1px solid #2d2d2d;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 8px;
+}
+
+.notification-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid #2d2d2d;
+}
+
+.notification-header h3 {
+    margin: 0;
+    font-size: 14px;
+    color: #e5e5e5;
+}
+
+.notification-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.notification-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid #2d2d2d;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+}
+
+.notification-item:hover {
+    background-color: #2d2d2d;
+}
+
+.notification-item p {
+    margin: 0 0 4px 0;
+    font-size: 14px;
+    color: #e5e5e5;
+}
+
+.notification-time {
+    font-size: 12px;
+    color: #a3a3a3;
+}
+
+.notification-footer {
+    padding: 12px 16px;
+    border-top: 1px solid #2d2d2d;
+}
+
+.mark-read-button {
+    background: none;
+    border: none;
+    color: #3b82f6;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 0;
+}
+
+.mark-read-button:hover {
+    color: #60a5fa;
+}
+
+/* Mobile menu styles */
+.mobile-menu-button {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    color: #a3a3a3;
+    cursor: pointer;
+}
+
+.mobile-menu-button button {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 4px;
+}
+
+.mobile-nav {
+    display: none;
+    padding: 8px 0;
+    background-color: #1a1a1a;
+}
+
+.mobile-nav-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    color: #a3a3a3;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.mobile-nav-link:hover {
+    color: white;
+    background-color: #2d2d2d;
+}
+
+/* Media queries */
+@media (max-width: 768px) {
+    .desktop-nav {
+        display: none;
+    }
+    
+    .mobile-menu-button {
+        display: block;
+    }
+    
+    .mobile-nav.active {
+        display: block;
+    }
+    
+    .notification-dropdown {
+        right: -50px;
+        width: 280px;
+    }
+}
+
+/* Main content padding */
+main {
+    padding-top: 64px;
+}

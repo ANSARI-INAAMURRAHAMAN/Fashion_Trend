@@ -1,0 +1,238 @@
+/* darkTheme.css */
+
+/* Global dark theme variables */
+:root {
+    --dark-bg-primary: #1a1b1e;
+    --dark-bg-secondary: #222327;
+    --dark-bg-tertiary: #2a2b2f;
+    --dark-text-primary: #ffffff;
+    --dark-text-secondary: #a0a0a0;
+    --dark-border: #2f3336;
+    --dark-hover: #2c2d31;
+    --dark-accent: #2196F3;
+    --dark-accent-hover: #1976D2;
+    --dark-success: #4CAF50;
+    --dark-warning: #FFC107;
+    --dark-danger: #FF5252;
+    --dark-card-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Body and main container */
+  body {
+    background-color: var(--dark-bg-primary);
+    color: var(--dark-text-primary);
+  }
+  
+  /* Navbar styles */
+  .navbar {
+    background: rgba(34, 35, 39, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  }
+  
+  .navbar.scrolled {
+    background: rgba(34, 35, 39, 0.98);
+  }
+  
+  .nav-item {
+    color: var(--dark-text-secondary);
+  }
+  
+  .nav-item:hover {
+    background: rgba(33, 150, 243, 0.15);
+    color: var(--dark-accent);
+  }
+  
+  .nav-item.active {
+    background: var(--dark-accent);
+    color: var(--dark-text-primary);
+  }
+  
+  /* Dashboard styles */
+  .dashboard {
+    background-color: var(--dark-bg-primary);
+  }
+  
+  .welcome-section h1 {
+    color: var(--dark-text-primary);
+  }
+  
+  .welcome-section p {
+    color: var(--dark-text-secondary);
+  }
+  
+  .date-filter select {
+    background: var(--dark-bg-secondary);
+    border-color: var(--dark-border);
+    color: var(--dark-text-primary);
+  }
+  
+  .date-filter select:hover {
+    border-color: var(--dark-accent);
+  }
+  
+  /* Card styles */
+  .trend-card {
+    background: var(--dark-bg-secondary);
+    box-shadow: var(--dark-card-shadow);
+  }
+  
+  .trend-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    background: var(--dark-hover);
+  }
+  
+  .trend-card-header h3 {
+    color: var(--dark-text-primary);
+  }
+  
+  .metric-label {
+    color: var(--dark-text-secondary);
+  }
+  
+  .progress-bar {
+    background: var(--dark-bg-tertiary);
+  }
+  
+  .stat-value {
+    color: var(--dark-text-primary);
+  }
+  
+  .stat-label {
+    color: var(--dark-text-secondary);
+  }
+  
+  /* Chart styles */
+  .chart-wrapper {
+    background: var(--dark-bg-secondary);
+    box-shadow: var(--dark-card-shadow);
+  }
+  
+  .chart-title h3 {
+    color: var(--dark-text-primary);
+  }
+  
+  .chart-title p {
+    color: var(--dark-text-secondary);
+  }
+  
+  .legend-item span {
+    color: var(--dark-text-secondary);
+  }
+  
+  .chart-text {
+    fill: var(--dark-text-secondary);
+  }
+  
+  /* Grid lines in chart */
+  .recharts-cartesian-grid-horizontal line,
+  .recharts-cartesian-grid-vertical line {
+    stroke: var(--dark-border);
+  }
+  
+  /* Tooltip style */
+  .recharts-tooltip-wrapper {
+    background: var(--dark-bg-secondary) !important;
+  }
+  
+  .recharts-default-tooltip {
+    background-color: var(--dark-bg-secondary) !important;
+    border: 1px solid var(--dark-border) !important;
+  }
+  
+  /* Filter styles */
+  .filters-container {
+    background: var(--dark-bg-secondary);
+    box-shadow: var(--dark-card-shadow);
+  }
+  
+  .filters-header h3 {
+    color: var(--dark-text-primary);
+  }
+  
+  .filter-group h4 {
+    color: var(--dark-text-secondary);
+  }
+  
+  .filter-btn {
+    background: var(--dark-bg-tertiary);
+    color: var(--dark-text-secondary);
+  }
+  
+  .filter-btn:hover {
+    background: var(--dark-hover);
+  }
+  
+  .filter-btn.active {
+    background: var(--dark-accent);
+    color: var(--dark-text-primary);
+  }
+  
+  .date-input {
+    background: var(--dark-bg-tertiary);
+    border-color: var(--dark-border);
+    color: var(--dark-text-primary);
+  }
+  
+  .range-slider .slider {
+    background: var(--dark-bg-tertiary);
+  }
+  
+  .range-slider .slider::-webkit-slider-thumb {
+    background: var(--dark-accent);
+  }
+  
+  .range-labels span {
+    color: var(--dark-text-secondary);
+  }
+  
+  /* Update styles */
+  .update-item {
+    background: var(--dark-bg-tertiary);
+  }
+  
+  .update-item h3 {
+    color: var(--dark-text-primary);
+  }
+  
+  .update-item p {
+    color: var(--dark-text-secondary);
+  }
+  
+  /* Scrollbar styles */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: var(--dark-bg-primary);
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: var(--dark-bg-tertiary);
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--dark-hover);
+  }
+  
+  /* Additional dark theme styles for specific elements */
+  .notification-badge {
+    background: var(--dark-danger);
+    color: var(--dark-text-primary);
+  }
+  
+  .profile-avatar {
+    border-color: var(--dark-accent);
+  }
+  
+  /* Make sure SVG elements in dark mode are visible */
+  svg line {
+    stroke: var(--dark-border);
+  }
+  
+  svg text {
+    fill: var(--dark-text-secondary);
+  }

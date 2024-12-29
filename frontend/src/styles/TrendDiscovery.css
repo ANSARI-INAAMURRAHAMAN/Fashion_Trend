@@ -1,0 +1,228 @@
+/* TrendDiscovery.css */
+.trend-discovery-container {
+    min-height: 100vh;
+    background-color: #111827;
+    color: #F3F4F6;
+    padding: 2rem 1.5rem;
+    padding-top: 5rem;
+  }
+  
+  .trend-header {
+    align-items: center;
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  
+  .gradient-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    background: linear-gradient(135deg, #8B5CF6, #3B82F6);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 0.5rem;
+  }
+  
+  .subtitle {
+    color: #9CA3AF;
+    font-size: 1.1rem;
+  }
+  
+  .search-section {
+    max-width: 800px;
+    margin: 0 auto 2rem;
+  }
+  
+  .search-bar {
+    display: flex;
+    align-items: center;
+    background: #1F2937;
+    border: 1px solid #374151;
+    border-radius: 1rem;
+    padding: 0.75rem 1.5rem;
+    gap: 1rem;
+  }
+  
+  .search-icon {
+    color: #6B7280;
+  }
+  
+  .search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #F3F4F6;
+    font-size: 1rem;
+    outline: none;
+  }
+  
+  .search-input::placeholder {
+    color: #6B7280;
+  }
+  
+  .filter-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #374151;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    color: #F3F4F6;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .filter-button:hover {
+    background: #4B5563;
+  }
+  
+  .category-tabs {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .category-tab {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #1F2937;
+    border: 1px solid #374151;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    color: #9CA3AF;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+  }
+  
+  .category-tab:hover {
+    background: #2D3748;
+  }
+  
+  .category-tab.active {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1));
+    border: 1px solid #8B5CF6;
+    color: #F3F4F6;
+  }
+  
+  .trends-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    padding: 1rem 0;
+  }
+  
+  .trend-card {
+    background: #1F2937;
+    border-radius: 1rem;
+    overflow: hidden;
+    border: 1px solid #374151;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .trend-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.2);
+  }
+  
+  .trend-image-container {
+    position: relative;
+    aspect-ratio: 4/3;
+  }
+  
+  .trend-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .trend-score {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(139, 92, 246, 0.9);
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    backdrop-filter: blur(4px);
+  }
+  
+  .score-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+  
+  .trend-content {
+    padding: 1.5rem;
+  }
+  
+  .trend-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #F3F4F6;
+  }
+  
+  .trend-details {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .detail-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #9CA3AF;
+  }
+  
+  .detail-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+  
+  .trend-metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    background: rgba(55, 65, 81, 0.5);
+    padding: 1rem;
+    border-radius: 0.5rem;
+  }
+  
+  .metric {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .metric-label {
+    color: #9CA3AF;
+    font-size: 0.875rem;
+  }
+  
+  .metric-value {
+    color: #F3F4F6;
+    font-weight: 600;
+  }
+  
+  @media (max-width: 768px) {
+    .trend-discovery-container {
+      padding: 1rem;
+      padding-top: 5rem;
+    }
+  
+    .gradient-title {
+      font-size: 2rem;
+    }
+  
+    .trends-grid {
+      grid-template-columns: 1fr;
+    }
+  }
