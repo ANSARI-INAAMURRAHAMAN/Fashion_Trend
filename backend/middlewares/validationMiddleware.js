@@ -1,12 +1,14 @@
 // middlewares/validationMiddleware.js
 const { validationResult } = require('express-validator');
+const ErrorResponse = require('../utils/errorResponse');
 
-const validateRequest = (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+exports.validate = (schema) => {
+  return async (req, res, next) => {
+    try {
+      await schema.validateAsync(req.body, { abortEarly: false });
+      next();
+    } catch (error) {
+      next(new ErrorResponse(error.details[0].message, 400));
     }
-    next();
+  };
 };
-
-module.exports = validateRequest;

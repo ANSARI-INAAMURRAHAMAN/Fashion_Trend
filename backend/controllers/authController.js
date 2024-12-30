@@ -25,16 +25,16 @@ exports.register = async (req, res) => {
         });
 
         console.log('User registered successfully:', { 
-            userId: user._id, 
+            userId: user.id, 
             username: user.username,
             timestamp: new Date().toISOString()
         });
 
         res.status(201).json({
-            _id: user._id,
+            _id: user.id,
             username: user.username,
             email: user.email,
-            token: generateToken(user._id)
+            token: generateToken(user.id)
         });
     } catch (error) {
         console.error('Registration error:', {

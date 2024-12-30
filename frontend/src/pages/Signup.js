@@ -34,7 +34,7 @@ const Signup = () => {
       setError('');
       const { confirmPassword, ...signupData } = formData;
       await authService.register(signupData);
-      navigate('/dashboard');
+      navigate('/login');
     } catch (err) {
       setError(err.response?.data?.message || 'Signup failed');
     } finally {
@@ -130,5 +130,6 @@ const Signup = () => {
     </div>
   );
 };
+
 
 export default Signup;

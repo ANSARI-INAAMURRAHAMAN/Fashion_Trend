@@ -1,10 +1,49 @@
 import React, { useState } from 'react';
 import { Menu, TrendingUp, BarChart2, Users, User } from 'lucide-react';
-import { Link } from 'react-router-dom';  // Import Link from react-router-dom
+import { Link, useLocation } from 'react-router-dom';
 import '../styles/Navbar.css';
 import NotificationCenter from './NotificationCenter';
+
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const location = useLocation();
+    
+    // Check if we're on login or signup pages
+    const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
+    
+    const renderAuthLinks = () => {
+        if (isAuthPage) {
+            return (
+                <>
+                    <Link to="/login" className="nav-link">
+                        <span>Login</span>
+                    </Link>
+                    <Link to="/signup" className="nav-link">
+                        <span>Signup</span>
+                    </Link>
+                </>
+            );
+        }
+        
+        return null; // Remove the logout button from the navbar
+    };
+
+    const renderMobileAuthLinks = () => {
+        if (isAuthPage) {
+            return (
+                <>
+                    <Link to="/login" className="mobile-nav-link">
+                        <span>Login</span>
+                    </Link>
+                    <Link to="/signup" className="mobile-nav-link">
+                        <span>Signup</span>
+                    </Link>
+                </>
+            );
+        }
+        
+        return null; // Remove the logout button from the mobile navbar
+    };
 
     return (
         <nav className="navbar">
@@ -31,10 +70,8 @@ const Navbar = () => {
                         </Link>
                         <Link to="/trend-analysis" className="nav-link">
                             <TrendingUp className="nav-icon" />
-                            
                             <span>Analyze</span>
                         </Link>
-                        
                         <Link to="/collaboration" className="nav-link">
                             <Users className="nav-icon" />
                             <span>Collaborate</span>
@@ -44,18 +81,14 @@ const Navbar = () => {
                             <span>Profile</span>
                         </Link>
 
-                        {/* Add Login and Signup Links */}
-                        <Link to="/login" className="nav-link">
-                            <span>Login</span>
-                        </Link>
-                        <Link to="/signup" className="nav-link">
-                            <span>Signup</span>
-                        </Link>
-                        <Link to="/NotificationCenter" className="nav-link">
-                            
-                            <NotificationCenter />
-                           
-                        </Link>
+                        {/* Conditional Auth Links */}
+                        {renderAuthLinks()}
+
+                        {!isAuthPage && (
+                            <Link to="/NotificationCenter" className="nav-link">
+                                <NotificationCenter />
+                            </Link>
+                        )}
                     </div>
                 </div>
 
@@ -78,13 +111,8 @@ const Navbar = () => {
                         <span>Profile</span>
                     </Link>
 
-                    {/* Add Login and Signup Links for Mobile */}
-                    <Link to="/login" className="mobile-nav-link">
-                        <span>Login</span>
-                    </Link>
-                    <Link to="/signup" className="mobile-nav-link">
-                        <span>Signup</span>
-                    </Link>
+                    {/* Conditional Mobile Auth Links */}
+                    {renderMobileAuthLinks()}
                 </div>
             </div>
         </nav>

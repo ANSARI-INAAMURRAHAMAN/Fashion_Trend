@@ -1,61 +1,130 @@
-import React, { useState } from 'react';
-import { ActivitySquare, User, Settings, Mail, Calendar, PenSquare } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ActivitySquare, User, Settings, Mail, Calendar, PenSquare, LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import '../styles/Profile.css';
+import { userService } from '../services/api';
+
 const Profile = () => {
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
-  
-  // Mock user data - replace with your actual data source
-  const userData = {
-    name: "Alex Thompson",
-    role: "Trend Analyst",
-    email: "alex.thompson@example.com",
-    joinDate: "January 2024",
-    trendsAnalyzed: 156,
-    collaborations: 23,
-    accuracy: 94.2
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchUserProfile = async () => {
+    try {
+      const data = await userService.getProfile();
+      setUserData(data);
+      setError(null);
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+      setError('Failed to load profile data');
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/login');
   };
 
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+    fetchUserProfile();
+  }, [navigate]);
+
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner">Loading...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="error-container">
+        <p>{error}</p>
+        <button onClick={fetchUserProfile}>Try Again</button>
+      </div>
+    );
+  }
+
+  if (!userData) {
+    return (
+      <div className="error-container">
+        <p>No profile data available</p>
+        <button onClick={() => navigate('/login')}>Go to Login</button>
+      </div>
+    );
+  }
+
   const stats = [
-    { label: "Trends Analyzed", value: userData.trendsAnalyzed, icon: ActivitySquare },
-    { label: "Collaborations", value: userData.collaborations, icon: User },
-    { label: "Accuracy Rate", value: `${userData.accuracy}%`, icon: ActivitySquare }
+    { 
+      label: 'Posts', 
+      value: userData.postsCount || 0, 
+      icon: ActivitySquare 
+    },
+    { 
+      label: 'Followers', 
+      value: userData.followersCount || 0, 
+      icon: User 
+    },
+    { 
+      label: 'Following', 
+      value: userData.followingCount || 0, 
+      icon: User 
+    },
   ];
+
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
 
   return (
     <div className="profile-container">
       <div className="profile-wrapper">
-        {/* Profile Header Card */}
         <div className="profile-header-wrapper">
           <div className="profile-header-blur"></div>
           <div className="profile-header-card">
             <div className="profile-header-content">
-              {/* Avatar Section */}
               <div className="profile-avatar-section">
                 <div className="profile-avatar">
-                  {userData.name.charAt(0)}
+                  {userData.username?.charAt(0)?.toUpperCase()}
                 </div>
-                <button 
-                  onClick={() => setIsEditing(!isEditing)}
-                  className="edit-avatar-button"
-                >
-                  <PenSquare size={16} />
-                </button>
+                {!isEditing && (
+                  <button 
+                    onClick={() => setIsEditing(true)}
+                    className="edit-avatar-button"
+                  >
+                    <PenSquare size={16} />
+                  </button>
+                )}
               </div>
 
-              {/* User Info Section */}
               <div className="profile-info-section">
                 <div className="profile-info-header">
                   <div>
-                    <h1 className="profile-name">{userData.name}</h1>
-                    <p className="profile-role">{userData.role}</p>
+                    <h1 className="profile-name">{userData.username}</h1>
+                    <p className="profile-role">{userData.role || 'User'}</p>
                   </div>
-                  <button className="edit-profile-button">
-                    Edit Profile
+                  <button 
+                    className="edit-profile-button"
+                    onClick={() => setIsEditing(!isEditing)}
+                  >
+                    {isEditing ? 'Save Changes' : 'Edit Profile'}
                   </button>
                 </div>
 
-                {/* Stats Grid */}
                 <div className="stats-grid">
                   {stats.map((stat, index) => (
                     <div key={index} className="stat-card">
@@ -72,7 +141,6 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Tabs Section */}
         <div className="tabs-section">
           <div className="tabs-list">
             <button 
@@ -98,7 +166,6 @@ const Profile = () => {
             </button>
           </div>
 
-          {/* Tab Content */}
           <div className="tab-content">
             {activeTab === 'overview' && (
               <div className="content-card">
@@ -115,9 +182,17 @@ const Profile = () => {
                     <Calendar size={20} className="info-icon" />
                     <div>
                       <p className="info-label">Joined</p>
-                      <p className="info-value">{userData.joinDate}</p>
+                      <p className="info-value">
+                        {formatDate(userData.createdAt)}
+                      </p>
                     </div>
                   </div>
+                  <div className="logout-section">
+          <button onClick={handleLogout} className="logout-button">
+            <LogOut size={16} />
+            <span>Logout</span>
+          </button>
+        </div>
                 </div>
               </div>
             )}
@@ -131,8 +206,11 @@ const Profile = () => {
 
             {activeTab === 'settings' && (
               <div className="content-card">
-                <h2 className="content-title">Settings</h2>
-                <p className="placeholder-text">Settings options will appear here.</p>
+                <h2 className="content-title">Account Settings</h2>
+                <div className="settings-form">
+                  {/* Add your settings form here */}
+                  <p className="placeholder-text">Settings options will appear here.</p>
+                </div>
               </div>
             )}
           </div>

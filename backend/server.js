@@ -38,6 +38,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/trends', trendRoutes);
 app.use('/api/notifications', notificationRoutes);
 
+
 // Default route
 app.get('/', (req, res) => {
     res.send('API is running...');
