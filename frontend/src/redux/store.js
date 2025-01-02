@@ -1,10 +1,11 @@
-import { createStore, applyMiddleware } from 'redux';
-import { thunk } from 'redux-thunk'; // Named import for redux-thunk
-import rootReducer from './reducers'; // Import your root reducer
+// redux/store.js
+import { configureStore } from '@reduxjs/toolkit';
+import authReducer from './reducers/authReducer';
+import trendReducer from './reducers/trendReducer';
 
-const store = createStore(
-  rootReducer, // your combined reducers
-  applyMiddleware(thunk) // Apply redux-thunk middleware for async actions
-);
-
-export default store;
+export default configureStore({
+    reducer: {
+        auth: authReducer,
+        trends: trendReducer
+    }
+});

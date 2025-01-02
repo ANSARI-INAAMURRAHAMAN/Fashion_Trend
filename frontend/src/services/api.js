@@ -9,6 +9,9 @@ axios.interceptors.request.use(
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
+        if (!config.baseURL) {
+            config.baseURL = API_URL;
+        }
         return config;
     },
     (error) => {
@@ -50,6 +53,30 @@ export const authService = {
         localStorage.removeItem('user');
     }
 };
+// services/api.js mein add karein
+export const shareTrend = async (trendId, userEmails, role = 'viewer') => {
+    const response = await fetch('/api/trends/share', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ trendId, userEmails, role })
+    });
+    return response.json();
+};
+
+export const addComment = async (trendId, content) => {
+    const response = await fetch(`/api/trends/${trendId}/comments`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ content })
+    });
+    return response.json();
+};
 
 export const userService = {
     getProfile: async () => {
@@ -72,3 +99,5 @@ export const userService = {
         }
     }
 };
+
+export default axios;

@@ -1,27 +1,64 @@
-// components/TrendCard.js
-import React, { useState } from 'react';
-import { TrendingUp, Map, Clock, Package, ChevronDown, ChevronUp } from 'lucide-react';
+// src/components/TrendCard.js
+import React, { useState, memo } from 'react';
+import { TrendingUp, Map, Clock, Package, ChevronDown, ChevronUp, Share2, MessageSquare } from 'lucide-react';
 import '../styles/TrendCard.css';
 
 const TrendCard = ({ trend }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [showComments, setShowComments] = useState(false);
+  const [comment, setComment] = useState('');
+  
+  const defaultImage = "/api/placeholder/400/300";
+
+  const handleCommentSubmit = async (e) => {
+    e.preventDefault();
+    if (comment.trim()) {
+      try {
+        const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/trends/comment`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify({
+            trendId: trend._id,
+            content: comment.trim(),
+          }),
+        });
+
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.message || 'Failed to post comment');
+        }
+
+        setComment('');
+        trend.comments = [...(trend.comments || []), data];
+        setShowComments(true);
+      } catch (error) {
+        console.error('Failed to post comment:', error);
+        alert(error.message || 'Failed to post comment. Please try again.');
+      }
+    }
+  };
 
   return (
     <div className="trend-card">
       <div className="trend-image-container">
         <img 
-          src={trend.images[0]?.url || "/api/placeholder/400/300"} 
-          alt={trend.name} 
+          src={trend.imageUrls?.[0] || defaultImage} 
+          alt={trend.title} 
           className="trend-image" 
         />
         <div className="trend-score">
           <TrendingUp className="score-icon" />
-          <span>{trend.score}</span>
+          <span>{trend.popularity}</span>
         </div>
       </div>
       
       <div className="trend-content">
-        <h3 className="trend-name">{trend.name}</h3>
+        <h3 className="trend-name">{trend.title}</h3>
         <div className="trend-details">
           <div className="detail-item">
             <Map className="detail-icon" />
@@ -39,14 +76,12 @@ const TrendCard = ({ trend }) => {
 
         <div className="trend-metrics">
           <div className="metric">
-            <span className="metric-label">Growth</span>
-            <span className="metric-value">+{trend.growth}%</span>
+            <span className="metric-label">Engagement</span>
+            <span className="metric-value">{trend.engagementRate}%</span>
           </div>
           <div className="metric">
-            <span className="metric-label">Price Range</span>
-            <span className="metric-value">
-              ${trend.priceRange.min}-{trend.priceRange.max}
-            </span>
+            <span className="metric-label">Status</span>
+            <span className="metric-value">{trend.status}</span>
           </div>
         </div>
 
@@ -61,11 +96,80 @@ const TrendCard = ({ trend }) => {
           <div className="expanded-content">
             <p className="trend-description">{trend.description}</p>
             <div className="trend-tags">
-              {trend.tags.map((tag, index) => (
-                <span key={index} className="tag">
-                  {tag}
-                </span>
+              {(trend.tags ?? []).map((tag, index) => (
+                <span key={index} className="tag">{tag}</span>
               ))}
+            </div>
+            <div className="ai-predictions">
+              <h4>AI Predictions</h4>
+              <div className="prediction-metrics">
+                <div className="prediction">
+                  <span>Growth Potential</span>
+                  <span>{trend.aiPredictions?.growthPotential}%</span>
+                </div>
+                <div className="prediction">
+                  <span>Market Fit</span>
+                  <span>{trend.aiPredictions?.marketFit}%</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="collaboration-section">
+              <div className="actions">
+                <button 
+                  className="action-button"
+                  onClick={() => setShowShareModal(true)}
+                >
+                  <Share2 size={18} />
+                  Share
+                </button>
+                <button 
+                  className="action-button"
+                  onClick={() => setShowComments(!showComments)}
+                >
+                  <MessageSquare size={18} />
+                  Comments ({trend.comments?.length || 0})
+                </button>
+              </div>
+
+              {showShareModal && (
+                <div className="modal">
+                  <div className="modal-content">
+                    <h4>Share Trend</h4>
+                    <input 
+                      type="email" 
+                      placeholder="Enter email addresses (comma separated)"
+                      className="share-input"
+                    />
+                    <div className="modal-actions">
+                      <button onClick={() => setShowShareModal(false)}>Cancel</button>
+                      <button className="primary">Share</button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {showComments && (
+                <div className="comments-section">
+                  <div className="comments-list">
+                    {trend.comments?.map((comment, index) => (
+                      <div key={index} className="comment">
+                        <span className="comment-author">{comment.user.username}</span>
+                        <p>{comment.content}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <form className="comment-form" onSubmit={handleCommentSubmit}>
+                    <input
+                      type="text"
+                      value={comment}
+                      onChange={(e) => setComment(e.target.value)}
+                      placeholder="Add a comment..."
+                    />
+                    <button type="submit">Send</button>
+                  </form>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -74,4 +178,4 @@ const TrendCard = ({ trend }) => {
   );
 };
 
-export default TrendCard;
+export default memo(TrendCard);

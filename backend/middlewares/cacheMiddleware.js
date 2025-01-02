@@ -1,23 +1,22 @@
-// middlewares/cacheMiddleware.js
-const mcache = require('memory-cache');
+const cache = require('memory-cache');
 
-const cache = (duration) => {
+const cacheMiddleware = (duration) => {
     return (req, res, next) => {
         const key = 'cache-' + req.originalUrl || req.url;
-        const cachedBody = mcache.get(key);
+        const cachedResponse = cache.get(key);
 
-        if (cachedBody) {
-            res.send(JSON.parse(cachedBody));
+        if (cachedResponse) {
+            res.send(JSON.parse(cachedResponse));
             return;
         } else {
             res.sendResponse = res.send;
             res.send = (body) => {
-                mcache.put(key, body, duration * 1000);
+                cache.put(key, JSON.stringify(body), duration * 1000);
                 res.sendResponse(body);
-            };
+            }
             next();
         }
-    };
+    }
 };
 
-module.exports = cache;
+module.exports = { cacheMiddleware };

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { ActivitySquare, User, Settings, Mail, Calendar, PenSquare, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Profile.css';
@@ -12,22 +12,43 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchUserProfile = async () => {
+  const fetchUserProfile = useCallback(async () => {
     try {
-      const data = await userService.getProfile();
-      setUserData(data);
+      setLoading(true);
       setError(null);
+      const data = await userService.getProfile();
+      if (!data) throw new Error('No data received');
+      setUserData(data);
     } catch (error) {
-      console.error('Error fetching profile:', error);
-      setError('Failed to load profile data');
+      setError(error.message || 'Failed to load profile data');
+      setUserData(null);
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  const handleEditProfile = async () => {
+    if (isEditing) {
+      try {
+        setLoading(true);
+        // Add your update profile logic here
+        await userService.updateProfile(userData);
+        setIsEditing(false);
+        await fetchUserProfile();
+      } catch (error) {
+        setError('Failed to update profile');
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      setIsEditing(true);
+    }
   };
-  const handleLogout = () => {
+
+  const handleLogout = useCallback(() => {
     localStorage.removeItem('token');
     navigate('/login');
-  };
+  }, [navigate]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -35,8 +56,21 @@ const Profile = () => {
       navigate('/login');
       return;
     }
-    fetchUserProfile();
-  }, [navigate]);
+    
+    let mounted = true;
+    
+    const loadProfile = async () => {
+      if (mounted) {
+        await fetchUserProfile();
+      }
+    };
+
+    loadProfile();
+
+    return () => {
+      mounted = false;
+    };
+  }, [navigate, fetchUserProfile]);
 
   if (loading) {
     return (
@@ -119,9 +153,10 @@ const Profile = () => {
                   </div>
                   <button 
                     className="edit-profile-button"
-                    onClick={() => setIsEditing(!isEditing)}
+                    onClick={handleEditProfile}
+                    disabled={loading}
                   >
-                    {isEditing ? 'Save Changes' : 'Edit Profile'}
+                    {loading ? 'Saving...' : isEditing ? 'Save Changes' : 'Edit Profile'}
                   </button>
                 </div>
 

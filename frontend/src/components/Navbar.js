@@ -72,9 +72,11 @@ const Navbar = () => {
                             <TrendingUp className="nav-icon" />
                             <span>Analyze</span>
                         </Link>
+                        <Link to="/teams" className="nav-link">
+                            Teams
+                        </Link>
                         <Link to="/collaboration" className="nav-link">
-                            <Users className="nav-icon" />
-                            <span>Collaborate</span>
+                            Collaboration
                         </Link>
                         <Link to="/profile" className="nav-link">
                             <User className="nav-icon" />
@@ -109,6 +111,9 @@ const Navbar = () => {
                     <Link to="/profile" className="mobile-nav-link">
                         <User className="nav-icon" />
                         <span>Profile</span>
+                    </Link>
+                    <Link to="/teams" className="mobile-nav-link">
+                        Teams
                     </Link>
 
                     {/* Conditional Mobile Auth Links */}
