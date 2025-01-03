@@ -82,10 +82,22 @@ export const userService = {
     getProfile: async () => {
         try {
             const response = await axios.get(`${API_URL}/api/users/profile`);
-            return response.data;
+            console.log('Profile response:', response.data);
+            
+            // Transform the data with default values
+            return {
+                ...response.data,
+                trendsCount: 0,  // Set default value until backend provides it
+                teamsCount: 0,   // Set default value until backend provides it
+                commentsCount: 0, // Set default value until backend provides it
+                email: response.data.email || '',
+                username: response.data.username || '',
+                role: response.data.role || 'user',
+                createdAt: response.data.createdAt || new Date().toISOString()
+            };
         } catch (error) {
             console.error('Profile fetch error:', error.response?.data || error);
-            throw error;
+            throw new Error(error.response?.data?.message || 'Failed to fetch profile');
         }
     },
 

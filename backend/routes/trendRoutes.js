@@ -18,6 +18,32 @@ const {
 // Get all trends
 router.get('/', getTrends);
 
+// Get shared trends
+router.get('/shared', protect, async (req, res) => {
+  try {
+    const trends = await Trend.find({ isShared: true })
+      .populate('createdBy', 'username avatar')
+      .populate({
+        path: 'comments',
+        populate: {
+          path: 'user',
+          select: 'username avatar'
+        }
+      })
+      .sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      data: trends
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
+
 router.post('/', protect, validateTrendInput, createTrend);
 router.post('/share', protect, shareTrend);
 router.post('/comment', protect, async (req, res) => {

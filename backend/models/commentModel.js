@@ -9,14 +9,13 @@ const commentSchema = new mongoose.Schema({
   },
   taskId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Task',
-    required: true
+    ref: 'Task'
   },
   trendId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Trend'
   },
-  author: {
+  user: {  // Changed from 'author' to 'user' for consistency
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
@@ -25,6 +24,14 @@ const commentSchema = new mongoose.Schema({
   timestamps: true,
   toJSON: { virtuals: true },
   toObject: { virtuals: true }
+});
+
+// Validate that either taskId or trendId is present
+commentSchema.pre('save', function(next) {
+  if (!this.taskId && !this.trendId) {
+    next(new Error('Comment must be associated with either a Task or a Trend'));
+  }
+  next();
 });
 
 module.exports = mongoose.model('Comment', commentSchema);

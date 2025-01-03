@@ -1,22 +1,46 @@
-// controllers/commentController.js
 const Comment = require('../models/commentModel');
+const Trend = require('../models/trendModel');
 
-const addComment = async (req, res) => {
+// Create a comment for either a task or trend
+const createComment = async (req, res) => {
     try {
-        const { content, taskId, trendId } = req.body;
-        const comment = await Comment.create({
+        const { content, trendId, taskId } = req.body;
+        
+        const comment = new Comment({
             content,
-            taskId,
             trendId,
-            author: req.user._id
+            taskId,
+            user: req.user._id
         });
 
-        const populatedComment = await Comment.findById(comment._id)
-            .populate('author', 'name');
+        await comment.save();
+        
+        // Populate user data before sending response
+        await comment.populate('user', 'username');
 
         res.status(201).json({
             success: true,
-            data: populatedComment
+            data: comment
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error creating comment',
+            error: error.message
+        });
+    }
+};
+
+// Get comments for a specific task
+const getTaskComments = async (req, res) => {
+    try {
+        const comments = await Comment.find({ taskId: req.params.taskId })
+            .populate('user', 'username')
+            .sort('-createdAt');
+
+        res.status(200).json({
+            success: true,
+            data: comments
         });
     } catch (error) {
         res.status(400).json({
@@ -26,10 +50,11 @@ const addComment = async (req, res) => {
     }
 };
 
-const getTaskComments = async (req, res) => {
+// Get comments for a specific trend
+const getTrendComments = async (req, res) => {
     try {
-        const comments = await Comment.find({ taskId: req.params.taskId })
-            .populate('author', 'name')
+        const comments = await Comment.find({ trendId: req.params.trendId })
+            .populate('user', 'username')
             .sort('-createdAt');
 
         res.status(200).json({
@@ -45,6 +70,7 @@ const getTaskComments = async (req, res) => {
 };
 
 module.exports = {
-    addComment,
-    getTaskComments
+    createComment,
+    getTaskComments,
+    getTrendComments
 };

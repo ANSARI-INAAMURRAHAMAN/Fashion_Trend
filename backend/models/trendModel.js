@@ -1,4 +1,3 @@
-// models/trendModel.js
 const mongoose = require('mongoose');
 
 const trendSchema = new mongoose.Schema({
@@ -60,10 +59,6 @@ const trendSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     }],
-    comments: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Comment'
-    }],
     createdAt: {
         type: Date,
         default: Date.now
@@ -79,6 +74,13 @@ trendSchema.virtual('user', {
     localField: 'createdBy',
     foreignField: '_id',
     justOne: true
+});
+
+// Add virtual populate for comments
+trendSchema.virtual('comments', {
+    ref: 'Comment',
+    localField: '_id',
+    foreignField: 'trendId'
 });
 
 trendSchema.pre('find', function() {

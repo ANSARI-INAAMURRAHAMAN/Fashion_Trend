@@ -15,30 +15,31 @@ const TrendCard = ({ trend }) => {
     e.preventDefault();
     if (comment.trim()) {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/trends/comment`, {
+        const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/comments`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           },
           body: JSON.stringify({
-            trendId: trend._id,
             content: comment.trim(),
+            trendId: trend._id,
           }),
         });
 
         const data = await response.json();
         
         if (!response.ok) {
-          throw new Error(data.message || 'Failed to post comment');
+          throw new Error(data.message || 'Failed to add comment');
         }
 
         setComment('');
-        trend.comments = [...(trend.comments || []), data];
+        // Update the comments array with the new comment
+        trend.comments = [...(trend.comments || []), data.data];
         setShowComments(true);
       } catch (error) {
         console.error('Failed to post comment:', error);
-        alert(error.message || 'Failed to post comment. Please try again.');
+        alert('Failed to post comment. Please try again.');
       }
     }
   };

@@ -59,6 +59,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/teams', require('./routes/teamRoutes'));
 app.use('/api/comments', require('./routes/comments'));
 app.use('/api/tasks', require('./routes/taskRoutes'));
+app.use('/api/meetings', require('./routes/meetingsRoutes'));
 // Default route
 app.get('/', (req, res) => {
     res.send('API is running...');

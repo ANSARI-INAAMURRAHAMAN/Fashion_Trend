@@ -16,10 +16,13 @@ const Profile = () => {
     try {
       setLoading(true);
       setError(null);
+      console.log('Fetching profile...'); // Debug log
       const data = await userService.getProfile();
+      console.log('Fetched profile data:', data); // Debug log
       if (!data) throw new Error('No data received');
       setUserData(data);
     } catch (error) {
+      console.error('Profile fetch error:', error);
       setError(error.message || 'Failed to load profile data');
       setUserData(null);
     } finally {
@@ -100,18 +103,18 @@ const Profile = () => {
 
   const stats = [
     { 
-      label: 'Posts', 
-      value: userData.postsCount || 0, 
+      label: 'Trends Created', 
+      value: userData?.trendsCount ?? 0, 
       icon: ActivitySquare 
     },
     { 
-      label: 'Followers', 
-      value: userData.followersCount || 0, 
+      label: 'Teams', 
+      value: userData?.teamsCount ?? 0, 
       icon: User 
     },
     { 
-      label: 'Following', 
-      value: userData.followingCount || 0, 
+      label: 'Comments', 
+      value: userData?.commentsCount ?? 0, 
       icon: User 
     },
   ];
@@ -133,7 +136,7 @@ const Profile = () => {
             <div className="profile-header-content">
               <div className="profile-avatar-section">
                 <div className="profile-avatar">
-                  {userData.username?.charAt(0)?.toUpperCase()}
+                  {userData?.username?.charAt(0)?.toUpperCase() || 'U'}
                 </div>
                 {!isEditing && (
                   <button 
@@ -148,8 +151,8 @@ const Profile = () => {
               <div className="profile-info-section">
                 <div className="profile-info-header">
                   <div>
-                    <h1 className="profile-name">{userData.username}</h1>
-                    <p className="profile-role">{userData.role || 'User'}</p>
+                    <h1 className="profile-name">{userData?.username || 'User'}</h1>
+                    <p className="profile-role">{userData?.role || 'User'}</p>
                   </div>
                   <button 
                     className="edit-profile-button"
@@ -210,7 +213,7 @@ const Profile = () => {
                     <Mail size={20} className="info-icon" />
                     <div>
                       <p className="info-label">Email</p>
-                      <p className="info-value">{userData.email}</p>
+                      <p className="info-value">{userData?.email || 'No email provided'}</p>
                     </div>
                   </div>
                   <div className="info-item">
@@ -218,7 +221,7 @@ const Profile = () => {
                     <div>
                       <p className="info-label">Joined</p>
                       <p className="info-value">
-                        {formatDate(userData.createdAt)}
+                        {userData?.createdAt ? formatDate(userData.createdAt) : 'Not available'}
                       </p>
                     </div>
                   </div>
