@@ -242,6 +242,7 @@
   position: relative;
   aspect-ratio: 4/5;
   overflow: hidden;
+  background: #1F2937;
 }
 
 .trend-image {
@@ -249,10 +250,22 @@
   height: 100%;
   object-fit: cover;
   transition: transform 0.3s ease-in-out;
+  min-height: 300px; /* Minimum height */
+  max-height: 500px; /* Maximum height */
 }
 
 .trend-card:hover .trend-image {
   transform: scale(1.05);
+}
+
+/* Add loading state styles */
+.trend-image.loading {
+  filter: blur(10px);
+  transition: filter 0.3s ease-in-out;
+}
+
+.trend-image.loaded {
+  filter: blur(0);
 }
 
 .trend-overlay {

@@ -3,13 +3,22 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts'
 import { TrendingUp, FileBarChart, ChevronRight } from 'lucide-react';
 import '../styles/Home.css';
 import trendService from '../services/trendService';
+import { getGoogleDriveImageUrl } from '../utils/driveUtils';
+import trend1 from '../assets/images/trends/trend1.jpg';
+// import trend2 from '../assets/images/trends/trend2.jpg';
+// import trend3 from '../assets/images/trends/trend3.jpg';
+// import trend4 from '../assets/images/trends/trend4.jpg';
+import { getImageDimensions } from '../utils/imageUtils';
 
 const Home = () => {
   const [categories, setCategories] = useState([]);
   const [recentTrends, setRecentTrends] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadedImages, setLoadedImages] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true);
       try {
         const [categoriesData, trendsData] = await Promise.all([
           trendService.getTrendingCategories(),
@@ -20,6 +29,8 @@ const Home = () => {
         setRecentTrends(trendsData.trends);
       } catch (error) {
         console.error('Error fetching data:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -41,30 +52,57 @@ const Home = () => {
       title: "Sustainable Street Wear",
       description: "Urban fashion meets eco-consciousness",
       trend: "+65% Growth",
-      image: "/api/placeholder/400/500"
+      image: trend1
     },
     {
       id: 2,
       title: "Neo-Vintage Revival",
       description: "Modern takes on classic styles",
       trend: "+48% Growth",
-      image: "/api/placeholder/400/500"
+      image: trend1
     },
     {
       id: 3,
       title: "Tech-Integrated Fashion",
       description: "Smart fabrics and wearable tech",
       trend: "+72% Growth",
-      image: "/api/placeholder/400/500"
+      image: trend1
     },
     {
       id: 4,
       title: "Minimalist Luxury",
       description: "Sophisticated simplicity in design",
       trend: "+53% Growth",
-      image: "/api/placeholder/400/500"
+      image: trend1
     }
   ];
+
+  // Add base64 fallback image
+  const fallbackImageBase64 = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDMwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9IiNFNUU3RUIiLz48cGF0aCBkPSJNMTUwIDEzNUMxNjQuMzU5IDEzNSAxNzYgMTIzLjM1OSAxNzYgMTA5QzE3NiA5NC42NDA2IDE2NC4zNTkgODMgMTUwIDgzQzEzNS42NDEgODMgMTI0IDk0LjY0MDYgMTI0IDEwOUMxMjQgMTIzLjM1OSAxMzUuNjQxIDEzNSAxNTAgMTM1WiIgZmlsbD0iIzk0QTNCNyIvPjxwYXRoIGQ9Ik0xNTYgMTk3SDg3QzgxLjQ3NzIgMTk3IDc3IDE5Mi41MjMgNzcgMTg3VjE4N0M3NyAxNjQuOTEgOTQuOTEgMTQ3IDExNyAxNDdIMTU2QzE3OC4wOSAxNDcgMTk2IDE2NC45MSAxOTYgMTg3VjE4N0MxOTYgMTkyLjUyMyAxOTEuNTIzIDE5NyAxODYgMTk3SDE1NloiIGZpbGw9IiM5NEEzQjciLz48L3N2Zz4=";
+
+  // Enhanced fallback image handling
+  const [imageLoadErrors, setImageLoadErrors] = useState({});
+  
+  const handleImageError = (e, trendId) => {
+    console.log('Image failed to load:', e.target.src);
+    setImageLoadErrors(prev => ({
+      ...prev,
+      [trendId]: true
+    }));
+    if (!e.target.src.startsWith('data:')) {
+      e.target.src = fallbackImageBase64;
+    }
+  };
+
+  const handleImageLoad = async (e, trendId) => {
+    const dimensions = await getImageDimensions(e.target.src);
+    e.target.classList.remove('loading');
+    e.target.classList.add('loaded');
+    setLoadedImages(prev => ({
+      ...prev,
+      [trendId]: dimensions
+    }));
+  };
 
   return (
     <div className="home-container" style={{ paddingTop: '64px' }}> {/* Add padding-top for navbar */}
@@ -117,7 +155,7 @@ const Home = () => {
             </div>
             <div className="progress-container">
               <div className="progress-bar">
-                <div className="progress-fill blue-gradient" style={{ width: '85%' }}></div>
+                <div className="progress-fill blue-gradient" style={{ width: '85%' }} />
               </div>
               <span className="progress-text">85%</span>
             </div>
@@ -131,9 +169,15 @@ const Home = () => {
               <div key={trend.id} className="trend-card">
                 <div className="trend-image-container">
                   <img 
-                    src={trend.image} 
+                    src={imageLoadErrors[trend.id] ? fallbackImageBase64 : trend.image} 
                     alt={trend.title} 
-                    className="trend-image"
+                    className="trend-image loading"
+                    onError={(e) => handleImageError(e, trend.id)}
+                    onLoad={(e) => handleImageLoad(e, trend.id)}
+                    loading="lazy"
+                    style={{
+                      objectFit: loadedImages[trend.id]?.aspectRatio < 0.8 ? 'contain' : 'cover'
+                    }}
                   />
                   <div className="trend-overlay">
                     <span className="trend-growth">{trend.trend}</span>
@@ -185,6 +229,7 @@ const Home = () => {
         </div>
       </div>
     </div>
+
   );
 };
 

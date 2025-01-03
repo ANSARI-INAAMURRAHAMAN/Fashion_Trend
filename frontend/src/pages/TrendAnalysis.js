@@ -1,15 +1,20 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import { trendAnalysisService } from '../services/api';
 import { 
   LineChart, Line, AreaChart, Area, BarChart, Bar,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   Legend, RadarChart, Radar, PolarGrid, PolarAngleAxis, 
-  PolarRadiusAxis, Scatter, ComposedChart, PieChart, Pie
+  PolarRadiusAxis, Scatter, ComposedChart, PieChart, Pie, Cell
 } from 'recharts';
+import { Gauge } from '../components/Gauge'; // Updated import path
 import '../styles/TrendAnalysis.css';
 import moment from 'moment';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import Select from 'react-select';
+
+// Add COLORS constant
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
 const TrendAnalysisDashboard = () => {
   // Enhanced state management
@@ -21,6 +26,27 @@ const TrendAnalysisDashboard = () => {
   const [threshold, setThreshold] = useState(50);
   const [showAnnotations, setShowAnnotations] = useState(false);
   const [selectedRegions, setSelectedRegions] = useState(['global']);
+
+  // Add new state for trend analysis data
+  const [trendData, setTrendData] = useState({
+    strengthIndicators: {},
+    demographics: { regions: [], ageGroups: [] },
+    businessImpact: { predictedSales: 0, markdownRisk: 'low' }
+  });
+
+  // Add useEffect to fetch trend analysis data
+  useEffect(() => {
+    const fetchTrendData = async () => {
+      try {
+        const data = await trendAnalysisService.getTrendAnalysis();
+        setTrendData(data);
+      } catch (error) {
+        console.error('Failed to fetch trend analysis:', error);
+      }
+    };
+    
+    fetchTrendData();
+  }, []);
 
   // Mock data generator with enhanced data points
   const generateMockData = (period, baseline = 100, region = 'global') => {
@@ -218,6 +244,84 @@ const TrendAnalysisDashboard = () => {
     // Implementation for adding annotations
   };
 
+  // Update renderStrengthIndicators to use trendData
+  const renderStrengthIndicators = () => (
+    <div className="strength-indicators">
+      <h2>Trend Strength Indicators</h2>
+      <div className="indicators-grid">
+        {Object.entries(trendData.strengthIndicators || {}).map(([key, value]) => (
+          <div key={key} className="indicator-card">
+            <Gauge value={value} title={key} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  // Update renderDemographicAnalysis to use trendData
+  const renderDemographicAnalysis = () => (
+    <div className="demographic-analysis">
+      <h2>Demographic Analysis</h2>
+      <div className="demographics-grid">
+        <div className="chart-container">
+          <h3>Regional Distribution</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={trendData.demographics.regions}
+                dataKey="value"
+                nameKey="name"
+                label
+              >
+                {trendData.demographics.regions.map((entry, index) => (
+                  <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+        
+        <div className="chart-container">
+          <h3>Age Group Distribution</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={trendData.demographics.ageGroups}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="group" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="percentage" fill="#8884d8" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Update renderBusinessImpact to use trendData
+  const renderBusinessImpact = () => (
+    <div className="business-impact">
+      <h2>Business Impact</h2>
+      <div className="impact-metrics">
+        <div className="metric-card">
+          <h3>Predicted Sales</h3>
+          <p className="metric-value">
+            ${(trendData.businessImpact.predictedSales / 1000000).toFixed(1)}M
+          </p>
+          <p className="metric-label">Expected Revenue</p>
+        </div>
+        <div className="metric-card">
+          <h3>Markdown Risk</h3>
+          <p className={`metric-value risk-${trendData.businessImpact.markdownRisk}`}>
+            {trendData.businessImpact.markdownRisk.toUpperCase()}
+          </p>
+          <p className="metric-label">Risk Level</p>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="dashboard">
       <div className="dashboard-container">
@@ -358,6 +462,9 @@ const TrendAnalysisDashboard = () => {
             );
           })}
         </div>
+        {renderStrengthIndicators()}
+        {renderDemographicAnalysis()}
+        {renderBusinessImpact()}
       </div>
     </div>
   );

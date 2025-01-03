@@ -15,28 +15,57 @@ import {
 } from '../types';
 import api from '../../services/api';
 
-export const fetchTrends = (filters = {}) => async (dispatch) => {
+// Add default parameters for pagination
+const DEFAULT_PARAMS = {
+  page: 1,
+  limit: 10
+};
+
+export const fetchTrends = (params = DEFAULT_PARAMS) => async (dispatch, getState) => {
   try {
-    dispatch({ type: FETCH_TRENDS_REQUEST });
+    dispatch({ type: 'FETCH_TRENDS_REQUEST' });
+    
+    // Ensure params has default values
+    const queryParams = {
+      ...DEFAULT_PARAMS,
+      ...params
+    };
 
-    const response = await api.get('/api/trends', { params: filters });
+    console.log('Fetching trends with params:', queryParams);
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/trends?page=${queryParams.page}&limit=${queryParams.limit}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+      }
+    );
 
-    dispatch({
-      type: FETCH_TRENDS_SUCCESS,
-      payload: response.data
-    });
-  } catch (error) {
-    if (!error.response) {
-      dispatch({
-        type: FETCH_TRENDS_SERVER_UNREACHABLE,
-        payload: 'Cannot reach server.'
-      });
-    } else {
-      dispatch({
-        type: FETCH_TRENDS_FAIL,
-        payload: error.response?.data?.message || 'Error fetching trends'
-      });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+
+    const data = await response.json();
+    console.log('Received trends data:', data);
+
+    const newTrends = data.data || [];
+    const updatedTrends = queryParams.page === 1 ? newTrends : [...getState().trends.trends, ...newTrends];
+
+    dispatch({ 
+      type: 'FETCH_TRENDS_SUCCESS', 
+      payload: updatedTrends
+    });
+
+    return newTrends;
+  } catch (error) {
+    console.error('Error fetching trends:', error);
+    dispatch({ 
+      type: 'FETCH_TRENDS_FAILURE', 
+      payload: error.message 
+    });
+    return [];
   }
 };
 
@@ -77,26 +106,25 @@ export const createTrend = (trendData) => async (dispatch) => {
   try {
     dispatch({ type: CREATE_TREND_REQUEST });
     
-    // Get auth token from localStorage
     const token = localStorage.getItem('token');
     if (!token) {
       throw new Error('Please login to create a trend');
     }
 
-    const config = {
+    const response = await api.post('/api/trends', trendData, {
       headers: {
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
       }
-    };
-    
-    const response = await api.post('/api/trends', trendData, config);
+    });
 
     dispatch({
       type: CREATE_TREND_SUCCESS,
-      payload: response.data.data
+      payload: response.data
     });
     
-    dispatch(fetchTrends());
+    // Fetch trends with default parameters after creating
+    await dispatch(fetchTrends());
     return response.data;
   } catch (error) {
     console.error('Create trend error:', error.response?.data || error);

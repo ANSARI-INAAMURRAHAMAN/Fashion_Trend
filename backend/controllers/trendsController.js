@@ -2,23 +2,12 @@
 const Trend = require('../models/trendModel');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
-const User = require('../models/userModel'); // Ensure User model is imported
+const User = require('../models/userModel');
 
 // Define createTrend
 const createTrend = asyncHandler(async (req, res) => {
   try {
-    // Debug logs
-    console.log('Request body:', req.body);
-    console.log('User:', req.user);
-
-    if (!req.user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Authentication required'
-      });
-    }
-
-    // Create trend with validated data
+    // Create trend with basic data
     const trendData = {
       ...req.body,
       createdBy: req.user._id
@@ -34,8 +23,7 @@ const createTrend = asyncHandler(async (req, res) => {
     console.error('Create trend error:', error);
     res.status(500).json({
       success: false,
-      message: error.message || 'Error creating trend',
-      error: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      message: error.message
     });
   }
 });

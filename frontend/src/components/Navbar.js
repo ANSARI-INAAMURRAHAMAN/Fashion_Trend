@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, TrendingUp, BarChart2, Users, User, UserPlus, MessagesSquare } from 'lucide-react';
+import { Menu, TrendingUp, BarChart2, Users, User, UserPlus, MessagesSquare, Leaf, FileText } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import '../styles/Navbar.css';
 import NotificationCenter from './NotificationCenter';
@@ -84,6 +84,14 @@ const Navbar = () => {
                             <User className="nav-icon" />
                             <span>Profile</span>
                         </Link>
+                        <Link to="/sustainability" className="nav-link">
+                            <Leaf className="nav-icon" />
+                            <span>Sustainability</span>
+                        </Link>
+                        <Link to="/reports" className="nav-link">
+                            <FileText className="nav-icon" />
+                            <span>Reports</span>
+                        </Link>
 
                         {/* Conditional Auth Links */}
                         {renderAuthLinks()}
@@ -117,6 +125,14 @@ const Navbar = () => {
                     <Link to="/teams" className="mobile-nav-link">
                         <UserPlus className="nav-icon" />
                         <span>Teams</span>
+                    </Link>
+                    <Link to="/sustainability" className="mobile-nav-link">
+                        <Leaf className="nav-icon" />
+                        <span>Sustainability</span>
+                    </Link>
+                    <Link to="/reports" className="mobile-nav-link">
+                        <FileText className="nav-icon" />
+                        <span>Reports</span>
                     </Link>
 
                     {/* Conditional Mobile Auth Links */}

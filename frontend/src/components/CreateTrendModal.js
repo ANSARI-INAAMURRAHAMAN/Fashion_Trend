@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { createTrend } from '../redux/actions/trendActions';
+import { toast } from 'react-toastify';  // Add this import
 import '../styles/CreateTrendModal.css';
 
 const CreateTrendModal = ({ isOpen, onClose }) => {
@@ -27,32 +28,18 @@ const CreateTrendModal = ({ isOpen, onClose }) => {
     }
   });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError(null);
-    
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     try {
-      // Ensure field names match the backend expectations
-      const submitData = {
-        title: formData.title,
-        description: formData.description,
-        season: formData.season,
-        category: formData.category,
-        region: formData.region,
-        imageUrls: formData.imageUrls, // Make sure we're using 'imageUrls' consistently
-        status: formData.status,
-        tags: formData.tags,
-        price: formData.price,
-        engagementRate: formData.engagementRate,
-        aiPredictions: formData.aiPredictions
-      };
-
-      console.log('Submitting trend data:', submitData);
-      await dispatch(createTrend(submitData));
-      onClose();
-    } catch (err) {
-      setError(err.message || 'Failed to create trend');
-      console.error('Error creating trend:', err);
+      // Use formData instead of trendData
+      await dispatch(createTrend(formData));
+      onClose(); // Close modal after successful creation
+      // Show success message
+      toast.success('Trend created successfully');
+    } catch (error) {
+      console.error('Error creating trend:', error);
+      toast.error(error.message || 'Failed to create trend');
+      setError(error.message || 'Failed to create trend');
     }
   };
 

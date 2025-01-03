@@ -15,109 +15,35 @@ import {
 } from '../types';
 
 const initialState = {
-  trends: [],
-  currentTrend: null,
+  trends: [], // Initialize as empty array
   loading: false,
   error: null,
-  filters: {
-    search: '',
-    category: '',
-    season: '',
-    gender: '',
-    region: '',
-    status: '',
-    minPopularity: 0,
-    minEngagement: 0
-  },
-  pagination: {
-    page: 1,
-    limit: 12,
-    total: 0,
-    pages: 0
-  }
+  filters: {}
 };
 
-export default function trendReducer(state = initialState, action) {
-  const { type, payload } = action;
-
-  switch (type) {
-    case FETCH_TRENDS_REQUEST:
+const trendReducer = (state = initialState, action) => {
+  switch (action.type) {
+    case 'FETCH_TRENDS_REQUEST':
       return {
         ...state,
-        loading: true,
-        error: null
+        loading: true
       };
-    case FETCH_TRENDS_SUCCESS:
+    case 'FETCH_TRENDS_SUCCESS':
       return {
         ...state,
         loading: false,
-        trends: action.payload.data,
-        pagination: action.payload.pagination
+        trends: action.payload,
+        error: null
       };
-    case FETCH_TRENDS_FAIL:
+    case 'FETCH_TRENDS_FAILURE':
       return {
         ...state,
         loading: false,
         error: action.payload
       };
-    case SET_TREND_FILTERS:
-      return {
-        ...state,
-        filters: {
-          ...state.filters,
-          ...action.payload
-        }
-      };
-    case CLEAR_TREND_FILTERS:
-      return {
-        ...state,
-        filters: initialState.filters
-      };
-    case GET_TRENDS:
-      return {
-        ...state,
-        trends: payload,
-        loading: false
-      };
-    case GET_TREND:
-      return {
-        ...state,
-        currentTrend: payload,
-        loading: false
-      };
-    case CREATE_TREND:
-      return {
-        ...state,
-        trends: [payload, ...state.trends],
-        loading: false
-      };
-    case UPDATE_TREND:
-      return {
-        ...state,
-        trends: state.trends.map(trend =>
-          trend._id === payload._id ? payload : trend
-        ),
-        loading: false
-      };
-    case DELETE_TREND:
-      return {
-        ...state,
-        trends: state.trends.filter(trend => trend._id !== payload),
-        loading: false
-      };
-    case TREND_ERROR:
-      return {
-        ...state,
-        error: payload,
-        loading: false
-      };
-    case CLEAR_TREND:
-      return {
-        ...state,
-        currentTrend: null,
-        loading: false
-      };
     default:
       return state;
   }
-}
+};
+
+export default trendReducer;

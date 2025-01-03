@@ -10,6 +10,10 @@ import Profile from './pages/Profile';
 import TeamsPage from './pages/TeamsPage';
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
+import Sustainability from './pages/Sustainability';
+import Reports from './pages/Reports';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const AppContent = () => {
     const location = useLocation();
@@ -23,6 +27,15 @@ const AppContent = () => {
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Signup />} />
                     
+                    <Route
+                        path="/sustainability"
+                        element={
+                            <ProtectedRoute>
+                                <Sustainability />
+                            </ProtectedRoute>
+                        }
+                    />
+
                     <Route
                         path="/"
                         element={
@@ -71,6 +84,14 @@ const AppContent = () => {
                             </ProtectedRoute>
                         }
                     />
+                    <Route
+                        path="/reports"
+                        element={
+                            <ProtectedRoute>
+                                <Reports />
+                            </ProtectedRoute>
+                        }
+                    />
                 </Routes>
             </div>
         </>
@@ -81,6 +102,7 @@ const App = () => {
     return (
         <Router>
             <AppContent />
+            <ToastContainer />
         </Router>
     );
 };
