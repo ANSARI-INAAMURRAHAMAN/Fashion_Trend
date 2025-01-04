@@ -239,3 +239,96 @@
     transform: translateY(1px);
     box-shadow: 0 2px 10px rgba(31, 111, 235, 0.2);
   }
+
+  /* Join Team Button Styles */
+  .join-btn {
+    background: linear-gradient(135deg, #2ea043 0%, #238636 100%);
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 1rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(46, 160, 67, 0.2);
+  }
+  
+  .join-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(46, 160, 67, 0.3);
+    background: linear-gradient(135deg, #3fb950 0%, #2ea043 100%);
+  }
+  
+  .join-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 10px rgba(46, 160, 67, 0.2);
+  }
+  
+  .join-btn:disabled {
+    background: #30363d;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+  
+  /* View Workspace Button Styles */
+  .view-workspace-btn {
+    background: linear-gradient(135deg, #1f6feb 0%, #388bfd 100%);
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 1rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(31, 111, 235, 0.2);
+  }
+  
+  .view-workspace-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent
+    );
+    transition: 0.5s;
+  }
+  
+  .view-workspace-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(31, 111, 235, 0.3);
+    background: linear-gradient(135deg, #388bfd 0%, #1f6feb 100%);
+  }
+  
+  .view-workspace-btn:hover::before {
+    left: 100%;
+  }
+  
+  .view-workspace-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 10px rgba(31, 111, 235, 0.2);
+  }
+  
+  .team-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 1rem;
+  }

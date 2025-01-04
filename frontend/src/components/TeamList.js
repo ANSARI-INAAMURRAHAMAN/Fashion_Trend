@@ -27,7 +27,8 @@ const TeamList = ({ onSelectTeam }) => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await axios.get('/api/teams');
+      // Fetch all teams without any filtering
+      const response = await axios.get('/api/teams/all');
       setTeams(response.data.data);
     } catch (error) {
       setError(error.message);
@@ -115,13 +116,13 @@ const TeamList = ({ onSelectTeam }) => {
     }
   };
 
+  // Update the renderTeamCard function to always show team details
   const renderTeamCard = (team) => {
     return (
       <div className="team-card" key={team._id}>
         <h3>{team.name}</h3>
         <p className="team-description">{team.description}</p>
         
-        {/* Updated creator display to use username */}
         <div className="team-meta">
           <span className="team-creator">
             Created by: <strong>{team.createdBy && team.createdBy.username}</strong>
@@ -131,7 +132,7 @@ const TeamList = ({ onSelectTeam }) => {
           </span>
         </div>
 
-        {/* Updated members section to use username */}
+        {/* Show all members regardless of user's membership */}
         <div className="member-section">
           <h4>Team Members ({team.members?.length || 0})</h4>
           <div className="member-tags">
@@ -149,12 +150,12 @@ const TeamList = ({ onSelectTeam }) => {
           </div>
         </div>
 
-        {/* Tasks summary - Updated task display with assignee username */}
+        {/* Show tasks for all teams */}
         {team.initialTasks && team.initialTasks.length > 0 && (
           <div className="team-tasks">
             <h4>Active Tasks ({team.initialTasks.length})</h4>
             <div className="tasks-summary">
-              {team.initialTasks.slice(0, 3).map(task => (
+              {team.initialTasks.map(task => (
                 <div key={task._id} className="task-item">
                   <span className="task-title">{task.title}</span>
                   <span className={`task-status ${task.status}`}>
@@ -165,11 +166,6 @@ const TeamList = ({ onSelectTeam }) => {
                   </span>
                 </div>
               ))}
-              {team.initialTasks.length > 3 && (
-                <div className="more-tasks">
-                  +{team.initialTasks.length - 3} more tasks
-                </div>
-              )}
             </div>
           </div>
         )}
@@ -177,12 +173,15 @@ const TeamList = ({ onSelectTeam }) => {
         {/* Action buttons */}
         <div className="team-actions">
           {!team.members?.some(m => m.user._id === currentUser?._id) ? (
-            <button className="join-btn" onClick={() => joinTeam(team._id)} disabled={isLoading}>
+            <button 
+              className="join-btn" 
+              onClick={() => joinTeam(team._id)} 
+              disabled={isLoading}
+            >
               {isLoading ? 'Joining...' : 'Join Team'}
             </button>
           ) : (
             <button 
-              id="view-workspace-btn" 
               className="view-workspace-btn"
               onClick={() => onSelectTeam(team._id)}
             >

@@ -1,0 +1,14 @@
+{
+  "files": {
+    "main.css": "/static/css/main.b700f3d0.css",
+    "main.js": "/static/js/main.95ab17cb.js",
+    "static/media/trend1.jpg": "/static/media/trend1.7005ca46500c6438c863.jpg",
+    "index.html": "/index.html",
+    "main.b700f3d0.css.map": "/static/css/main.b700f3d0.css.map",
+    "main.95ab17cb.js.map": "/static/js/main.95ab17cb.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.b700f3d0.css",
+    "static/js/main.95ab17cb.js"
+  ]
+}

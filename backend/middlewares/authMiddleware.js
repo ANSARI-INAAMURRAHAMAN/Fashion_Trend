@@ -1,7 +1,6 @@
 // middlewares/authMiddleware.js
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');  // Updated to correct filename
-const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../utils/asyncHandler');
 
 const protect = asyncHandler(async (req, res, next) => {
@@ -15,12 +14,20 @@ const protect = asyncHandler(async (req, res, next) => {
             req.user = await User.findById(decoded.id).select('-password');
             next();
         } catch (error) {
-            return next(new ErrorResponse('Not authorized', 401));
+            res.status(401).json({
+                success: false,
+                message: 'Not authorized, token failed'
+            });
+            return;
         }
     }
 
     if (!token) {
-        return next(new ErrorResponse('Not authorized, no token', 401));
+        res.status(401).json({
+            success: false,
+            message: 'Not authorized, no token'
+        });
+        return;
     }
 });
 

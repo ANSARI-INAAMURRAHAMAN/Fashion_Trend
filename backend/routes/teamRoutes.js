@@ -1,23 +1,29 @@
 // routes/teamRoutes.js
 const express = require('express');
 const router = express.Router();
-const { protect } = require('../middlewares/authMiddleware');
-const {
-  createTeam,
-  getTeams,
-  joinTeam,
+const { 
+  createTeam, 
+  getTeamById, 
+  getTeams, 
+  joinTeam, 
+  getTeamTasks,
   getAvailableUsers,
-  getTeamById,          // Add this
-  getTeamTasks         // Add this
+  getAllTeams 
 } = require('../controllers/teamController');
+const { protect } = require('../middlewares/authMiddleware'); // Updated path
 
-router.post('/', protect, createTeam);
-router.get('/', protect, getTeams);
-router.post('/:teamId/join', protect, joinTeam);
-router.get('/available-users', protect, getAvailableUsers);
+// Apply auth middleware to all routes
+router.use(protect);
 
-// Add these new routes
-router.get('/:teamId', protect, getTeamById);
-router.get('/:teamId/tasks', protect, getTeamTasks);
+// Team routes
+router.route('/')
+  .post(createTeam)
+  .get(getTeams);
+
+router.get('/all', getAllTeams);
+router.get('/available-users', getAvailableUsers);
+router.get('/:teamId', getTeamById);
+router.get('/:teamId/tasks', getTeamTasks);
+router.post('/:teamId/join', joinTeam);
 
 module.exports = router;

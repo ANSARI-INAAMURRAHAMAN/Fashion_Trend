@@ -202,17 +202,26 @@
 }
 
 .team-selector {
-  background: var(--bg-tertiary);
+  background: var(--bg-primary);
   padding: 0.5rem;
   border-radius: 8px;
+  border: 1px solid var(--border-color);
 }
 
 .team-select {
-  background: transparent;
+  background: var(--bg-primary);
   border: none;
   color: var(--text-primary);
   font-size: 1rem;
   padding: 0.25rem 0.5rem;
+  width: 100%;
+  cursor: pointer;
+}
+
+.team-select option {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  padding: 0.5rem;
 }
 
 .admin-badge {
@@ -236,7 +245,7 @@
   border-bottom: 1px solid var(--border-color);
   padding-bottom: 0.5rem;
 }
-
+s
 .meeting-form-overlay {
   position: fixed;
   top: 0;
