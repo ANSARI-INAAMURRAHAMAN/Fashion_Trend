@@ -34,4 +34,14 @@ commentSchema.pre('save', function(next) {
   next();
 });
 
+commentSchema.post('save', async function(doc) {
+    try {
+        const User = mongoose.model('User');
+        const commentsCount = await this.model('Comment').countDocuments({ user: doc.user });
+        await User.findByIdAndUpdate(doc.user, { commentsCount });
+    } catch (error) {
+        console.error('Error updating user comments count:', error);
+    }
+});
+
 module.exports = mongoose.model('Comment', commentSchema);

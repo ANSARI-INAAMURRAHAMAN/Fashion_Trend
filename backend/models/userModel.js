@@ -22,6 +22,18 @@ const userSchema = new mongoose.Schema({
         enum: ['user', 'admin'],
         default: 'user'
     },
+    trendsCount: {
+        type: Number,
+        default: 0
+    },
+    teamsCount: {
+        type: Number,
+        default: 0
+    },
+    commentsCount: {
+        type: Number,
+        default: 0
+    },
     preferences: {
         type: Object,
         default: {}

@@ -6,5 +6,6 @@ const { protect } = require('../middlewares/authMiddleware');
 
 router.get('/profile', protect, userController.getProfile);
 router.put('/profile', protect, userController.updateProfile);
+router.post('/refresh-counts', protect, userController.refreshCounts);
 
 module.exports = router;

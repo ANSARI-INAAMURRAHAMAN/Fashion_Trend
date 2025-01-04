@@ -93,4 +93,14 @@ trendSchema.pre('find', function() {
     });
 });
 
+trendSchema.post('save', async function(doc) {
+    try {
+        const User = mongoose.model('User');
+        const trendsCount = await this.model('Trend').countDocuments({ createdBy: doc.createdBy });
+        await User.findByIdAndUpdate(doc.createdBy, { trendsCount });
+    } catch (error) {
+        console.error('Error updating user trends count:', error);
+    }
+});
+
 module.exports = mongoose.models.Trend || mongoose.model('Trend', trendSchema);

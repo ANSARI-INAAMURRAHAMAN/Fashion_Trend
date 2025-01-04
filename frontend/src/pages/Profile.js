@@ -53,6 +53,18 @@ const Profile = () => {
     navigate('/login');
   }, [navigate]);
 
+  const refreshCounts = async () => {
+    try {
+      const counts = await userService.refreshCounts();
+      setUserData(prev => ({
+        ...prev,
+        ...counts
+      }));
+    } catch (error) {
+      console.error('Error refreshing counts:', error);
+    }
+  };
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -65,6 +77,7 @@ const Profile = () => {
     const loadProfile = async () => {
       if (mounted) {
         await fetchUserProfile();
+        await refreshCounts(); // Add this line
       }
     };
 
@@ -104,17 +117,17 @@ const Profile = () => {
   const stats = [
     { 
       label: 'Trends Created', 
-      value: userData?.trendsCount ?? 0, 
+      value: userData?.trendsCount || 0, 
       icon: ActivitySquare 
     },
     { 
       label: 'Teams', 
-      value: userData?.teamsCount ?? 0, 
+      value: userData?.teamsCount || 0, 
       icon: User 
     },
     { 
       label: 'Comments', 
-      value: userData?.commentsCount ?? 0, 
+      value: userData?.commentsCount || 0, 
       icon: User 
     },
   ];

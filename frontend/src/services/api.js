@@ -19,6 +19,14 @@ axios.interceptors.request.use(
     }
 );
 
+const authHeader = () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+        return { Authorization: `Bearer ${token}` };
+    }
+    return {};
+};
+
 export const authService = {
     register: async (userData) => {
         try {
@@ -95,6 +103,16 @@ export const userService = {
             return response.data;
         } catch (error) {
             console.error('Profile update error:', error.response?.data || error);
+            throw error;
+        }
+    },
+
+    refreshCounts: async () => {
+        try {
+            const response = await axios.post(`${API_URL}/api/users/refresh-counts`);
+            return response.data;
+        } catch (error) {
+            console.error('Refresh counts error:', error.response?.data || error);
             throw error;
         }
     }
