@@ -1,6 +1,6 @@
 .trend-discovery-container {
   padding: 2rem;
-  width: 100%;
+  width: 86%;
   box-sizing: border-box;
   overflow-x: hidden; /* Prevent horizontal scrolling */
 }

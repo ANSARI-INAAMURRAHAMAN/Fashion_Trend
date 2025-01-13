@@ -1,5 +1,6 @@
 /* styles/Collaboration.css */
 .collaboration-container {
+  width: 80%;
   margin-top: 10vh;
   padding: 2rem;
   background: var(--bg-primary);
