@@ -19,7 +19,11 @@ const { errorHandler } = require('./middlewares/errorMiddleware');
 const app = express();
 // backend/server.js
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: [
+        'http://localhost:3000',
+        'https://fashion-trend-frontend.onrender.com' // You'll add this after frontend deployment
+    ],
+
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
