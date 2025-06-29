@@ -5,6 +5,7 @@ const Trend = require('../models/trendModel');
 const Comment = require('../models/commentModel');
 const { protect } = require('../middlewares/authMiddleware');  // Updated path
 const { validateTrendInput } = require('../middlewares/validationMiddleware');
+const { trackTrendView, trackInteraction } = require('../middlewares/analyticsMiddleware');
 const { 
     getTrends,
     createTrend,
@@ -12,14 +13,16 @@ const {
     deleteTrend,
     shareTrend,
     addComment,
-    getTrendAnalytics
+    getTrendAnalytics,
+    getTrendAnalysis,
+    trackUserInteraction
 } = require('../controllers/trendsController');
 
-// Get all trends
-router.get('/', getTrends);
+// Get all trends (with automatic view tracking)
+router.get('/', trackTrendView, getTrends);
 
-// Get shared trends
-router.get('/shared', protect, async (req, res) => {
+// Get shared trends (with automatic view tracking)
+router.get('/shared', protect, trackTrendView, async (req, res) => {
   try {
     const trends = await Trend.find({ isShared: true })
       .populate('createdBy', 'username avatar')
@@ -45,8 +48,8 @@ router.get('/shared', protect, async (req, res) => {
 });
 
 router.post('/', protect, validateTrendInput, createTrend);
-router.post('/share', protect, shareTrend);
-router.post('/comment', protect, async (req, res) => {
+router.post('/share', protect, trackInteraction('share'), shareTrend);
+router.post('/comment', protect, trackInteraction('comment'), async (req, res) => {
   try {
     const { trendId, content } = req.body;
     
@@ -90,5 +93,9 @@ router.route('/:id')
     .delete(protect, deleteTrend);
 
 router.get('/:id/analytics', protect, getTrendAnalytics);
+
+// New analytics endpoints
+router.get('/:id/analysis', protect, getTrendAnalysis);
+router.post('/track-interaction', protect, trackUserInteraction);
 
 module.exports = router;

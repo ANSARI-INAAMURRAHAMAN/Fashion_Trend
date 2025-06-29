@@ -3,6 +3,7 @@ const Trend = require('../models/trendModel');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 const User = require('../models/userModel');
+const AnalyticsService = require('../services/analyticsService');
 
 // Define createTrend
 const createTrend = asyncHandler(async (req, res) => {
@@ -171,7 +172,10 @@ const addComment = asyncHandler(async (req, res) => {
 // Define getTrendAnalytics
 const getTrendAnalytics = asyncHandler(async (req, res) => {
   try {
-    const trend = await Trend.findById(req.params.id);
+    const { id: trendId } = req.params;
+    const { period = '30d', type = 'overview' } = req.query;
+    
+    const trend = await Trend.findById(trendId);
     
     if (!trend) {
       return res.status(404).json({
@@ -180,22 +184,112 @@ const getTrendAnalytics = asyncHandler(async (req, res) => {
       });
     }
 
-    // Example analytics data
-    const analytics = {
-      views: trend.views || 0,
-      comments: trend.comments.length,
-      // Add more analytics metrics as needed
-    };
+    let analyticsData;
+
+    switch (type) {
+      case 'overview':
+        analyticsData = await AnalyticsService.getAggregatedAnalytics(trendId, period);
+        break;
+      case 'detailed':
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setDate(endDate.getDate() - parseInt(period));
+        analyticsData = await AnalyticsService.getTrendAnalytics(trendId, startDate, endDate);
+        break;
+      default:
+        analyticsData = await AnalyticsService.getAggregatedAnalytics(trendId, period);
+    }
 
     res.status(200).json({
       success: true,
-      data: analytics
+      data: analyticsData
     });
   } catch (error) {
     console.error('Error fetching trend analytics:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching trend analytics',
+      error: error.message
+    });
+  }
+});
+
+// New endpoint for comprehensive trend analysis
+const getTrendAnalysis = asyncHandler(async (req, res) => {
+  try {
+    const { id: trendId } = req.params;
+    const { period = '30d' } = req.query;
+    
+    const trend = await Trend.findById(trendId);
+    
+    if (!trend) {
+      return res.status(404).json({
+        success: false,
+        message: 'Trend not found'
+      });
+    }
+
+    // Track this view
+    if (req.user) {
+      await AnalyticsService.trackInteraction(
+        req.user._id,
+        trendId,
+        'view',
+        {
+          userAgent: req.get('User-Agent'),
+          ipAddress: req.ip
+        }
+      );
+    }
+
+    const analyticsData = await AnalyticsService.getAggregatedAnalytics(trendId, period);
+
+    res.status(200).json({
+      success: true,
+      data: analyticsData
+    });
+  } catch (error) {
+    console.error('Error fetching trend analysis:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching trend analysis',
+      error: error.message
+    });
+  }
+});
+
+// Track interaction endpoint
+const trackUserInteraction = asyncHandler(async (req, res) => {
+  try {
+    const { trendId, interactionType, metadata = {} } = req.body;
+    
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Authentication required'
+      });
+    }
+
+    const interaction = await AnalyticsService.trackInteraction(
+      req.user._id,
+      trendId,
+      interactionType,
+      {
+        ...metadata,
+        userAgent: req.get('User-Agent'),
+        ipAddress: req.ip
+      }
+    );
+
+    res.status(201).json({
+      success: true,
+      data: interaction
+    });
+  } catch (error) {
+    console.error('Error tracking interaction:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error tracking interaction',
       error: error.message
     });
   }
@@ -210,5 +304,7 @@ module.exports = {
   deleteTrend,
   shareTrend,
   addComment,
-  getTrendAnalytics // Add this line
+  getTrendAnalytics,
+  getTrendAnalysis,
+  trackUserInteraction
 };
