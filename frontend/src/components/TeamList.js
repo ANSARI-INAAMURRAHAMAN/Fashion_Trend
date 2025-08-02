@@ -23,15 +23,41 @@ const TeamList = ({ onSelectTeam }) => {
     setCurrentUser(user);
   }, []);
 
+  // Add function to get auth headers
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('token');
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
+
+  // Add function to get axios config with base URL and auth
+  const getAxiosConfig = (additionalConfig = {}) => {
+    const baseURL = process.env.REACT_APP_API_URL || 'https://fashion-trend-backend.onrender.com';
+    return {
+      baseURL,
+      headers: {
+        ...getAuthHeaders(),
+        'Content-Type': 'application/json',
+      },
+      ...additionalConfig
+    };
+  };
+
   const fetchTeams = async () => {
     setIsLoading(true);
     setError(null);
     try {
-      // Fetch all teams without any filtering
-      const response = await axios.get('/api/teams/all');
+      // Fetch all teams with authentication
+      const response = await axios.get('/api/teams/all', getAxiosConfig());
       setTeams(response.data.data);
     } catch (error) {
-      setError(error.message);
+      if (error.response?.status === 401) {
+        setError('Authentication failed. Please log in again.');
+        // Optionally redirect to login
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      } else {
+        setError(error.response?.data?.message || error.message);
+      }
       console.error('Error fetching teams:', error);
     } finally {
       setIsLoading(false);
@@ -40,10 +66,14 @@ const TeamList = ({ onSelectTeam }) => {
 
   const fetchAvailableUsers = async () => {
     try {
-      const response = await axios.get('/api/teams/available-users');
+      const response = await axios.get('/api/teams/available-users', getAxiosConfig());
       setAvailableUsers(response.data.data);
     } catch (error) {
-      console.error('Error fetching users:', error);
+      if (error.response?.status === 401) {
+        console.error('Authentication failed for available users');
+      } else {
+        console.error('Error fetching users:', error);
+      }
     }
   };
 
@@ -86,7 +116,7 @@ const TeamList = ({ onSelectTeam }) => {
         ...newTeam,
         members: selectedMembers,
         initialTasks: validTasks
-      });
+      }, getAxiosConfig());
 
       if (response.data.success) {
         setShowCreateModal(false);
@@ -96,8 +126,12 @@ const TeamList = ({ onSelectTeam }) => {
         fetchTeams();
       }
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Error creating team';
-      setError(errorMessage);
+      if (error.response?.status === 401) {
+        setError('Authentication failed. Please log in again.');
+      } else {
+        const errorMessage = error.response?.data?.message || 'Error creating team';
+        setError(errorMessage);
+      }
       console.error('Error creating team:', error);
     }
   };
@@ -105,13 +139,17 @@ const TeamList = ({ onSelectTeam }) => {
   const joinTeam = async (teamId) => {
     setJoinError(null);
     try {
-      const response = await axios.post(`/api/teams/${teamId}/join`);
+      const response = await axios.post(`/api/teams/${teamId}/join`, {}, getAxiosConfig());
       if (response.data.success) {
         fetchTeams();
       }
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Error joining team';
-      setJoinError(errorMessage);
+      if (error.response?.status === 401) {
+        setJoinError('Authentication failed. Please log in again.');
+      } else {
+        const errorMessage = error.response?.data?.message || 'Error joining team';
+        setJoinError(errorMessage);
+      }
       console.error('Error joining team:', error);
     }
   };
