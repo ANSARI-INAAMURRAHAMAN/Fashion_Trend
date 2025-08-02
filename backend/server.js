@@ -17,9 +17,15 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const { errorHandler } = require('./middlewares/errorMiddleware');
 
 const app = express();
-// backend/server.js
+
+// Updated CORS configuration for production
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: [
+        'http://localhost:3000',
+        'http://localhost:3001',
+        'https://fashion-trend-frontend.onrender.com',
+        'https://fashion-trend-backend.onrender.com'
+    ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
@@ -90,10 +96,16 @@ const server = app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
 
-// Initialize Socket.IO after server creation
+// Initialize Socket.IO with updated CORS for production
 const io = require('socket.io')(server, {
     cors: {
-        origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+        origin: [
+            'http://localhost:3000',
+            'http://localhost:3001',
+            'https://fashion-trend-frontend.onrender.com',
+            'https://fashion-trend-backend.onrender.com'
+        ],
+        credentials: true,
         methods: ['GET', 'POST']
     }
 });
