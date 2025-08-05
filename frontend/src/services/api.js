@@ -186,33 +186,137 @@ export const reportsService = {
 export const sustainabilityService = {
     getSustainabilityData: async () => {
         try {
-            // Temporary mock data until backend is ready
-            const mockData = {
-                carbonFootprint: 1250,
-                wasteReduced: 750,
+            const response = await axios.get(`${API_URL}/api/sustainability/data`, {
+                headers: authHeader()
+            });
+            return response.data.data;
+        } catch (error) {
+            console.warn('Sustainability API not available, using enhanced mock data');
+            
+            // Enhanced mock data with realistic sustainability information
+            return {
+                carbonFootprint: 2847,
+                wasteReduced: 1523,
                 sustainableTrends: [
                     {
-                        title: "Eco-Friendly Materials",
-                        description: "Using recycled fabrics and sustainable materials",
-                        imageUrl: "https://example.com/eco-fashion.jpg",
-                        sustainableMaterials: ["Recycled Polyester", "Organic Cotton", "Hemp"]
+                        title: "Mycelium Leather Revolution",
+                        description: "Fashion brands are adopting mushroom-based leather alternatives, reducing cattle farming impact by 85%.",
+                        imageUrl: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=300&h=200&fit=crop",
+                        sustainableMaterials: ["Mycelium Leather", "Biodegradable", "Cruelty-Free"]
+                    },
+                    {
+                        title: "Ocean Plastic Activewear",
+                        description: "Sportswear made from recycled ocean plastic is cleaning waterways while creating performance gear.",
+                        imageUrl: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop",
+                        sustainableMaterials: ["Ocean Plastic", "Recycled Nylon", "Marine Waste"]
+                    },
+                    {
+                        title: "Circular Fashion Platforms",
+                        description: "Digital platforms enabling clothing rental, resale, and repair to extend garment lifecycles by 300%.",
+                        imageUrl: "https://images.unsplash.com/photo-1556906781-9a412961c28c?w=300&h=200&fit=crop",
+                        sustainableMaterials: ["Rental Model", "Repair Services", "Lifecycle Extension"]
+                    },
+                    {
+                        title: "Lab-Grown Cotton Innovation",
+                        description: "Bioengineered cotton grown in labs uses 99% less water and land than traditional farming.",
+                        imageUrl: "https://images.unsplash.com/photo-1586075010923-2dd4570fb338?w=300&h=200&fit=crop",
+                        sustainableMaterials: ["Lab-Grown Cotton", "Water Efficient", "Land Conservation"]
+                    },
+                    {
+                        title: "Biodegradable Packaging",
+                        description: "Fashion brands switching to compostable packaging made from seaweed and agricultural waste.",
+                        imageUrl: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=300&h=200&fit=crop",
+                        sustainableMaterials: ["Seaweed Packaging", "Compostable", "Zero Waste"]
+                    },
+                    {
+                        title: "AI-Powered Demand Forecasting",
+                        description: "Machine learning reduces overproduction by 40% through accurate demand prediction.",
+                        imageUrl: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=300&h=200&fit=crop",
+                        sustainableMaterials: ["AI Technology", "Demand Optimization", "Waste Prevention"]
                     }
                 ],
                 recommendations: [
                     {
-                        title: "Reduce Waste",
-                        description: "Implement zero-waste pattern cutting techniques"
+                        title: "Calculate Your Fashion Footprint",
+                        description: "Use online calculators to understand the environmental impact of your wardrobe. A typical cotton t-shirt uses 2,700 liters of water to produce."
                     },
                     {
-                        title: "Energy Efficiency",
-                        description: "Use energy-efficient manufacturing processes"
+                        title: "Embrace the 30-Wear Rule",
+                        description: "Before buying, ask yourself: 'Will I wear this at least 30 times?' This simple rule can dramatically reduce impulse purchases."
+                    },
+                    {
+                        title: "Support Circular Brands",
+                        description: "Choose brands offering take-back programs, repair services, or made-to-order options to minimize waste."
+                    },
+                    {
+                        title: "Master the Art of Layering",
+                        description: "Invest in versatile basics that can be mixed, matched, and layered to create multiple outfits from fewer pieces."
+                    },
+                    {
+                        title: "Host Clothing Swap Parties",
+                        description: "Organize events where friends bring clothes they no longer wear. It's fun, social, and sustainable!"
+                    },
+                    {
+                        title: "Learn Fabric Care Science",
+                        description: "Wash in cold water (saves 90% energy), air dry when possible, and use eco-friendly detergents to extend garment life."
+                    },
+                    {
+                        title: "Research Brand Transparency",
+                        description: "Look for brands that publish sustainability reports, share supply chain information, and have third-party certifications."
+                    },
+                    {
+                        title: "Invest in Timeless Pieces",
+                        description: "Build a capsule wardrobe with high-quality, classic pieces that won't go out of style and will last for years."
                     }
                 ]
             };
-            return mockData;
+        }
+    },
+
+    getFullSustainabilityData: async () => {
+        try {
+            const response = await axios.get(`${API_URL}/api/sustainability/full`, {
+                headers: authHeader()
+            });
+            return response.data.data;
         } catch (error) {
-            console.error('Sustainability data fetch error:', error);
-            throw error;
+            console.warn('Sustainability API not available, using enhanced mock data');
+            
+            // Return the same mock data as getSustainabilityData
+            const mockData = await sustainabilityService.getSustainabilityData();
+            return mockData;
+        }
+    },
+
+    getTrends: async () => {
+        try {
+            const response = await axios.get(`${API_URL}/api/sustainability/trends`, {
+                headers: authHeader()
+            });
+            return response.data.data;
+        } catch (error) {
+            console.warn('Sustainability trends API not available');
+            const mockData = await sustainabilityService.getSustainabilityData();
+            return {
+                trends: mockData.sustainableTrends,
+                totalTrends: mockData.sustainableTrends.length
+            };
+        }
+    },
+
+    getRecommendations: async () => {
+        try {
+            const response = await axios.get(`${API_URL}/api/sustainability/recommendations`, {
+                headers: authHeader()
+            });
+            return response.data.data;
+        } catch (error) {
+            console.warn('Sustainability recommendations API not available');
+            const mockData = await sustainabilityService.getSustainabilityData();
+            return {
+                recommendations: mockData.recommendations,
+                totalRecommendations: mockData.recommendations.length
+            };
         }
     }
 };

@@ -13,7 +13,7 @@ const Sustainability = () => {
             try {
                 setLoading(true);
                 setError(null);
-                const data = await sustainabilityService.getSustainabilityData();
+                const data = await sustainabilityService.getFullSustainabilityData();
                 setSustainabilityData(data || {
                     carbonFootprint: 0,
                     wasteReduced: 0,
