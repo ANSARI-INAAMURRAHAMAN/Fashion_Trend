@@ -61,6 +61,7 @@ mongoose.connect(process.env.MONGODB_URI, {
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/trends', trendRoutes);
+app.use('/api/trend-analysis', require('./routes/trendAnalysisRoutes'));
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/teams', require('./routes/teamRoutes'));
 app.use('/api/comments', require('./routes/comments'));

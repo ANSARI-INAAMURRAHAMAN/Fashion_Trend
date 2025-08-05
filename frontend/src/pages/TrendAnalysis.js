@@ -1,17 +1,13 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { trendAnalysisService } from '../services/api';
 import { 
-  LineChart, Line, AreaChart, Area, BarChart, Bar,
+  LineChart, Line, Area, BarChart, Bar,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   Legend, RadarChart, Radar, PolarGrid, PolarAngleAxis, 
   PolarRadiusAxis, Scatter, ComposedChart, PieChart, Pie, Cell
 } from 'recharts';
-import { Gauge } from '../components/Gauge'; // Updated import path
+import { Gauge } from '../components/Gauge';
 import '../styles/TrendAnalysis.css';
-import moment from 'moment';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import Select from 'react-select';
 
 // Add COLORS constant
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
@@ -26,27 +22,56 @@ const TrendAnalysisDashboard = () => {
   const [threshold, setThreshold] = useState(50);
   const [showAnnotations, setShowAnnotations] = useState(false);
   const [selectedRegions, setSelectedRegions] = useState(['global']);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Add new state for trend analysis data
   const [trendData, setTrendData] = useState({
     strengthIndicators: {},
-    demographics: { regions: [], ageGroups: [] },
-    businessImpact: { predictedSales: 0, markdownRisk: 'low' }
+    demographics: { 
+      regions: [], 
+      ageGroups: [] 
+    },
+    businessImpact: { 
+      predictedSales: 0, 
+      markdownRisk: 'low' 
+    }
+  });
+
+  // Add state for storing API data
+  const [apiData, setApiData] = useState({
+    current: { global: [] },
+    previous: { global: [] }
   });
 
   // Add useEffect to fetch trend analysis data
   useEffect(() => {
     const fetchTrendData = async () => {
       try {
-        const data = await trendAnalysisService.getTrendAnalysis();
-        setTrendData(data);
+        setIsLoading(true);
+        const fetchedData = await trendAnalysisService.getTrendAnalysis(timeRange, selectedRegions);
+        setTrendData(fetchedData);
+        
+        // Update the data state with real Google Trends data
+        setApiData({
+          current: fetchedData.current,
+          previous: fetchedData.current // You can add previous period logic
+        });
+        
       } catch (error) {
         console.error('Failed to fetch trend analysis:', error);
+        // Fallback to mock data if API fails
+        setTrendData({
+          strengthIndicators: {},
+          demographics: { regions: [], ageGroups: [] },
+          businessImpact: { predictedSales: 0, markdownRisk: 'low' }
+        });
+      } finally {
+        setIsLoading(false);
       }
     };
     
     fetchTrendData();
-  }, []);
+  }, [timeRange, selectedRegions]);
 
   // Mock data generator with enhanced data points
   const generateMockData = (period, baseline = 100, region = 'global') => {
@@ -63,16 +88,16 @@ const TrendAnalysisDashboard = () => {
     }));
   };
 
-  const metrics = [
+  const metrics = useMemo(() => [
     { id: 'popularity', color: '#8884d8', label: 'Popularity Score' },
     { id: 'engagement', color: '#82ca9d', label: 'Engagement Rate' },
     { id: 'retention', color: '#ffc658', label: 'Retention Rate' },
     { id: 'growth', color: '#ff7c43', label: 'Growth Rate' },
     { id: 'revenue', color: '#4CAF50', label: 'Revenue' },
     { id: 'users', color: '#E91E63', label: 'Active Users' }
-  ];
+  ], []);
 
-  const regions = ['global', 'na', 'eu', 'asia', 'latam'];
+  const regions = useMemo(() => ['global', 'na', 'eu', 'asia', 'latam'], []);
 
   // Generate data for all regions
   const data = useMemo(() => {
@@ -87,14 +112,31 @@ const TrendAnalysisDashboard = () => {
       current: generateRegionalData(),
       previous: generateRegionalData()
     };
-  }, [timeRange]);
+  }, [timeRange, regions]);
 
   // Filter and process data based on selected options
   const processedData = useMemo(() => {
+    // Use API data if available, otherwise use mock data
+    const currentData = Object.keys(apiData.current).length > 0 && apiData.current.global.length > 0 
+      ? apiData.current 
+      : data.current;
+    
     let filteredData = [];
     
+    // Ensure we have valid data structure
+    if (!currentData || typeof currentData !== 'object') {
+      return [];
+    }
+    
     selectedRegions.forEach(region => {
-      filteredData = [...filteredData, ...data.current[region]];
+      if (currentData[region] && Array.isArray(currentData[region])) {
+        // Filter out any invalid data points
+        const validData = currentData[region].filter(item => 
+          item && typeof item === 'object' && 
+          selectedMetrics.every(metric => typeof item[metric] === 'number')
+        );
+        filteredData = [...filteredData, ...validData];
+      }
     });
 
     if (dateFilter !== 'all') {
@@ -104,12 +146,12 @@ const TrendAnalysisDashboard = () => {
 
     if (threshold > 0) {
       filteredData = filteredData.filter(item => 
-        selectedMetrics.some(metric => item[metric] > threshold)
+        selectedMetrics.some(metric => item[metric] && item[metric] > threshold)
       );
     }
 
     return filteredData;
-  }, [data, selectedRegions, dateFilter, threshold, selectedMetrics]);
+  }, [apiData, data, selectedRegions, dateFilter, threshold, selectedMetrics]);
 
   // Enhanced tooltip component
   const CustomTooltip = ({ active, payload, label }) => {
@@ -132,6 +174,20 @@ const TrendAnalysisDashboard = () => {
 
   // Enhanced chart renderer with multiple chart types
   const renderChart = useCallback(() => {
+    // Safety check: ensure we have valid data before rendering charts
+    if (!processedData || processedData.length === 0) {
+      return (
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          height: '300px',
+          color: '#9ca3af'
+        }}>
+          <p>No data available for the selected filters</p>
+        </div>
+      );
+    }
     switch (chartType) {
       case 'line':
         return (
@@ -236,7 +292,7 @@ const TrendAnalysisDashboard = () => {
           </ComposedChart>
         );
     }
-  }, [chartType, comparisonMode, selectedMetrics, processedData]);
+  }, [chartType, comparisonMode, selectedMetrics, processedData, metrics]);
 
   // Additional interactive features
   const addAnnotation = (event) => {
@@ -268,12 +324,12 @@ const TrendAnalysisDashboard = () => {
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
-                data={trendData.demographics.regions}
+                data={trendData.demographics?.regions || []}
                 dataKey="value"
                 nameKey="name"
                 label
               >
-                {trendData.demographics.regions.map((entry, index) => (
+                {(trendData.demographics?.regions || []).map((entry, index) => (
                   <Cell key={index} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
@@ -286,7 +342,7 @@ const TrendAnalysisDashboard = () => {
         <div className="chart-container">
           <h3>Age Group Distribution</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={trendData.demographics.ageGroups}>
+            <BarChart data={trendData.demographics?.ageGroups || []}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="group" />
               <YAxis />
@@ -325,10 +381,16 @@ const TrendAnalysisDashboard = () => {
   return (
     <div className="dashboard">
       <div className="dashboard-container">
+        {isLoading && (
+          <div className="loading-overlay">
+            <div className="loading-spinner">Loading Google Trends data...</div>
+          </div>
+        )}
+        
         <div className="header">
           <div className="header-title">
             <h1>Trend Analysis</h1>
-            <p>Real-time insights and metrics</p>
+            <p>Real-time insights and metrics powered by Google Trends</p>
           </div>
           <div className="header-controls">
             <button 
@@ -441,9 +503,43 @@ const TrendAnalysisDashboard = () => {
         <div className="metrics-grid">
           {selectedMetrics.map(metricId => {
             const metric = metrics.find(m => m.id === metricId);
-            const currentValue = processedData[processedData.length - 1][metricId];
-            const previousValue = processedData[0][metricId];
-            const change = ((currentValue - previousValue) / previousValue * 100).toFixed(1);
+            
+            // Add safety checks for data access
+            if (!processedData || processedData.length === 0) {
+              return (
+                <div key={metricId} className="metric-card">
+                  <h3>{metric?.label || 'Loading...'}</h3>
+                  <div className="metric-value">
+                    <p style={{ color: metric?.color || '#8884d8' }}>
+                      Loading...
+                    </p>
+                  </div>
+                </div>
+              );
+            }
+
+            const lastDataPoint = processedData[processedData.length - 1];
+            const firstDataPoint = processedData[0];
+            
+            // Ensure data points exist and have the required properties
+            if (!lastDataPoint || !firstDataPoint || 
+                lastDataPoint[metricId] === undefined || 
+                firstDataPoint[metricId] === undefined) {
+              return (
+                <div key={metricId} className="metric-card">
+                  <h3>{metric?.label || 'Unknown'}</h3>
+                  <div className="metric-value">
+                    <p style={{ color: metric?.color || '#8884d8' }}>
+                      No data
+                    </p>
+                  </div>
+                </div>
+              );
+            }
+
+            const currentValue = lastDataPoint[metricId];
+            const previousValue = firstDataPoint[metricId];
+            const change = previousValue > 0 ? ((currentValue - previousValue) / previousValue * 100).toFixed(1) : '0.0';
 
             return (
               <div key={metricId} className="metric-card">

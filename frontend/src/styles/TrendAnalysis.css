@@ -9,6 +9,31 @@
   .dashboard-container {
     max-width: 1280px;
     margin: 0 auto;
+    position: relative;
+  }
+
+  .loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(17, 24, 39, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    border-radius: 8px;
+  }
+
+  .loading-spinner {
+    background-color: #1f2937;
+    color: #f3f4f6;
+    padding: 20px 40px;
+    border-radius: 8px;
+    border: 1px solid #374151;
+    font-size: 16px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
   
   .header {

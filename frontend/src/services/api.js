@@ -218,50 +218,82 @@ export const sustainabilityService = {
 };
 
 export const trendAnalysisService = {
-    getTrendAnalysis: async (trendId) => {
+    getTrendAnalysis: async (timeRange = '3M', regions = ['global']) => {
         try {
-            // Temporary mock data until backend is ready
-            const mockData = {
-                strengthIndicators: {
-                    popularity: 85,
-                    longevity: 78,
-                    marketPenetration: 62,
-                    confidence: 89
+            const response = await axios.get(`${API_URL}/api/trend-analysis/analysis`, {
+                params: {
+                    timeRange,
+                    regions: regions.join(',')
                 },
-                evolutionData: [
-                    { month: 'Jan', popularity: 45, engagement: 30, marketShare: 20 },
-                    { month: 'Feb', popularity: 52, engagement: 35, marketShare: 25 },
-                    { month: 'Mar', popularity: 65, engagement: 45, marketShare: 35 },
-                    { month: 'Apr', popularity: 85, engagement: 60, marketShare: 45 }
-                ],
+                headers: authHeader()
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching trend analysis:', error);
+            // Fallback to mock data if API fails
+            const mockData = {
+                current: {
+                    global: Array.from({ length: 30 }, (_, i) => ({
+                        day: i + 1,
+                        popularity: 70 + Math.random() * 30,
+                        engagement: 65 + Math.random() * 25,
+                        retention: 80 + Math.random() * 15,
+                        growth: 5 + Math.random() * 20,
+                        revenue: 500 + Math.random() * 300,
+                        users: 1000 + Math.random() * 500
+                    }))
+                },
+                strengthIndicators: {
+                    'Market Penetration': 75 + Math.random() * 20,
+                    'Engagement Rate': 68 + Math.random() * 25,
+                    'Growth Momentum': 82 + Math.random() * 15,
+                    'Trend Velocity': 71 + Math.random() * 20
+                },
                 demographics: {
                     regions: [
-                        { name: 'North America', value: 35 },
-                        { name: 'Europe', value: 28 },
-                        { name: 'Asia', value: 22 },
-                        { name: 'Others', value: 15 }
+                        { name: 'GLOBAL', value: 35 + Math.random() * 20 },
+                        { name: 'NA', value: 28 + Math.random() * 15 },
+                        { name: 'EU', value: 22 + Math.random() * 10 },
+                        { name: 'ASIA', value: 15 + Math.random() * 8 }
                     ],
                     ageGroups: [
-                        { group: '18-24', percentage: 30 },
-                        { group: '25-34', percentage: 40 },
-                        { group: '35-44', percentage: 20 },
-                        { group: '45+', percentage: 10 }
+                        { group: '18-24', percentage: 30 + Math.random() * 10 },
+                        { group: '25-34', percentage: 40 + Math.random() * 10 },
+                        { group: '35-44', percentage: 20 + Math.random() * 5 },
+                        { group: '45+', percentage: 10 + Math.random() * 5 }
                     ]
                 },
                 businessImpact: {
-                    predictedSales: 15000000,
-                    markdownRisk: 'low',
-                    profitMargin: 28,
-                    marketGrowth: 15
+                    predictedSales: 15000000 + Math.random() * 5000000,
+                    markdownRisk: ['low', 'medium', 'high'][Math.floor(Math.random() * 3)]
                 }
             };
             return mockData;
-            
-            // Uncomment when backend is ready
-            // const response = await axios.get(`${API_URL}/api/trends/analysis/${trendId}`);
-            // return response.data;
+        }
+    },
+
+    getKeywordTrends: async (keyword, timeframe = '3M', region = '') => {
+        try {
+            const response = await axios.get(`${API_URL}/api/trend-analysis/keyword/${keyword}`, {
+                params: { timeframe, region },
+                headers: authHeader()
+            });
+            return response.data;
         } catch (error) {
-            console.error('Trend analysis fetch error:', error);
+            console.error('Error fetching keyword trends:', error);
+            throw error;
+        }
+    },
+
+    getRelatedQueries: async (keyword, region = '') => {
+        try {
+            const response = await axios.get(`${API_URL}/api/trend-analysis/related/${keyword}`, {
+                params: { region },
+                headers: authHeader()
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching related queries:', error);
             throw error;
         }
     },
